@@ -1,0 +1,94 @@
+import { useEffect, useRef } from 'react';
+import { MicOff, Crown } from 'lucide-react';
+import { Participant } from '@/store/useMeetingStore';
+
+interface VideoTileProps {
+  participant: Participant;
+  stream?: MediaStream | null;
+  isLocal?: boolean;
+  isMuted?: boolean;
+  isVideoOff?: boolean;
+}
+
+export default function VideoTile({
+  participant,
+  stream,
+  isLocal = false,
+  isMuted = false,
+  isVideoOff = false,
+}: VideoTileProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream]);
+
+  // Get initials for avatar
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Debug log
+  console.log('VideoTile render:', { 
+    displayName: participant.displayName, 
+    isLocal, 
+    isVideoOff, 
+    hasStream: !!stream,
+    streamTracks: stream?.getTracks().length 
+  });
+
+  return (
+    <div className="video-container relative group">
+      {/* Video or Avatar */}
+      {!isVideoOff && stream ? (
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted={isLocal}
+          className={`w-full h-full object-cover ${isLocal ? 'transform scale-x-[-1]' : ''}`}
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-dark-800">
+          <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary-600 flex items-center justify-center text-white text-xl md:text-2xl font-semibold">
+            {getInitials(participant.displayName)}
+          </div>
+        </div>
+      )}
+
+      {/* Bottom overlay with name and icons */}
+      <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {participant.isHost && (
+              <Crown className="w-4 h-4 text-yellow-500" />
+            )}
+            <span className="text-white text-sm font-medium truncate">
+              {participant.displayName}
+              {isLocal && ' (You)'}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            {isMuted && (
+              <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center">
+                <MicOff className="w-3 h-3 text-white" />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Speaking indicator (placeholder) */}
+      {!isMuted && (
+        <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-primary-500/30 transition-colors pointer-events-none" />
+      )}
+    </div>
+  );
+}

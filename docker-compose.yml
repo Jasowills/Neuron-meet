@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: neuron-meet-db
+    environment:
+      POSTGRES_USER: neuronmeet
+      POSTGRES_PASSWORD: neuronmeet
+      POSTGRES_DB: neuronmeet
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U neuronmeet']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.server
+    container_name: neuron-meet-server
+    environment:
+      DATABASE_URL: postgresql://neuronmeet:neuronmeet@postgres:5432/neuronmeet
+      JWT_SECRET: your-production-secret-change-me
+      JWT_EXPIRES_IN: 7d
+      PORT: 3001
+      NODE_ENV: production
+    ports:
+      - '3001:3001'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  client:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.client
+    container_name: neuron-meet-client
+    ports:
+      - '80:80'
+    depends_on:
+      - server
+
+volumes:
+  postgres_data:

@@ -1,0 +1,263 @@
+import { create } from "zustand";
+
+export interface Participant {
+  socketId: string;
+  userId?: string;
+  displayName: string;
+  isHost: boolean;
+  isMuted: boolean;
+  isVideoOff: boolean;
+  isScreenSharing: boolean;
+  stream?: MediaStream;
+}
+
+export interface ChatMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  content: string;
+  type: "TEXT" | "FILE" | "SYSTEM";
+  timestamp: string;
+}
+
+interface RoomSettings {
+  allowScreenShare: boolean;
+  allowChat: boolean;
+  allowParticipantVideo: boolean;
+  allowParticipantAudio: boolean;
+  waitingRoom: boolean;
+}
+
+interface MeetingState {
+  // Room info
+  roomId: string | null;
+  roomCode: string | null;
+  isHost: boolean;
+  isConnected: boolean;
+  isLocked: boolean;
+  settings: RoomSettings | null;
+
+  // Participants
+  participants: Map<string, Participant>;
+  localParticipant: Participant | null;
+
+  // Media state
+  localStream: MediaStream | null;
+  screenStream: MediaStream | null;
+  isMuted: boolean;
+  isVideoOff: boolean;
+  isScreenSharing: boolean;
+
+  // UI state
+  isChatOpen: boolean;
+  isParticipantsOpen: boolean;
+  isSettingsOpen: boolean;
+
+  // Chat
+  messages: ChatMessage[];
+  typingUsers: Map<string, string>;
+
+  // Actions
+  setRoomInfo: (
+    roomId: string,
+    roomCode: string,
+    isHost: boolean,
+    settings: RoomSettings | null,
+  ) => void;
+  setConnected: (connected: boolean) => void;
+  setLocalStream: (stream: MediaStream | null) => void;
+  setScreenStream: (stream: MediaStream | null) => void;
+  setLocalParticipant: (participant: Participant | null) => void;
+
+  addParticipant: (participant: Participant) => void;
+  removeParticipant: (socketId: string) => void;
+  updateParticipant: (socketId: string, updates: Partial<Participant>) => void;
+  setParticipantStream: (socketId: string, stream: MediaStream) => void;
+
+  toggleMute: () => void;
+  toggleVideo: () => void;
+  setScreenSharing: (sharing: boolean) => void;
+
+  toggleChat: () => void;
+  toggleParticipants: () => void;
+  toggleSettings: () => void;
+
+  addMessage: (message: ChatMessage) => void;
+  setMessages: (messages: ChatMessage[]) => void;
+  setTypingUser: (
+    socketId: string,
+    displayName: string,
+    isTyping: boolean,
+  ) => void;
+
+  reset: () => void;
+}
+
+const initialState = {
+  roomId: null,
+  roomCode: null,
+  isHost: false,
+  isConnected: false,
+  isLocked: false,
+  settings: null,
+  participants: new Map(),
+  localParticipant: null,
+  localStream: null,
+  screenStream: null,
+  isMuted: false,
+  isVideoOff: false,
+  isScreenSharing: false,
+  isChatOpen: false,
+  isParticipantsOpen: false,
+  isSettingsOpen: false,
+  messages: [],
+  typingUsers: new Map(),
+};
+
+export const useMeetingStore = create<MeetingState>((set, get) => ({
+  ...initialState,
+
+  setRoomInfo: (roomId, roomCode, isHost, settings) => {
+    set({ roomId, roomCode, isHost, settings });
+  },
+
+  setConnected: (connected) => {
+    set({ isConnected: connected });
+  },
+
+  setLocalStream: (stream) => {
+    set({ localStream: stream });
+  },
+
+  setScreenStream: (stream) => {
+    set({ screenStream: stream, isScreenSharing: !!stream });
+  },
+
+  setLocalParticipant: (participant) => {
+    set({ localParticipant: participant });
+  },
+
+  addParticipant: (participant) => {
+    const { participants } = get();
+    const newParticipants = new Map(participants);
+    newParticipants.set(participant.socketId, participant);
+    set({ participants: newParticipants });
+  },
+
+  removeParticipant: (socketId) => {
+    const { participants } = get();
+    const newParticipants = new Map(participants);
+    newParticipants.delete(socketId);
+    set({ participants: newParticipants });
+  },
+
+  updateParticipant: (socketId, updates) => {
+    const { participants } = get();
+    const participant = participants.get(socketId);
+    if (participant) {
+      const newParticipants = new Map(participants);
+      newParticipants.set(socketId, { ...participant, ...updates });
+      set({ participants: newParticipants });
+    }
+  },
+
+  setParticipantStream: (socketId, stream) => {
+    const { participants } = get();
+    const participant = participants.get(socketId);
+    if (participant) {
+      const newParticipants = new Map(participants);
+      newParticipants.set(socketId, { ...participant, stream });
+      set({ participants: newParticipants });
+    }
+  },
+
+  toggleMute: () => {
+    const { isMuted, localStream } = get();
+    const newMuted = !isMuted;
+
+    // Toggle audio track
+    if (localStream) {
+      localStream.getAudioTracks().forEach((track) => {
+        track.enabled = !newMuted;
+      });
+    }
+
+    set({ isMuted: newMuted });
+  },
+
+  toggleVideo: () => {
+    const { isVideoOff, localStream } = get();
+    const newVideoOff = !isVideoOff;
+
+    // Toggle video track
+    if (localStream) {
+      localStream.getVideoTracks().forEach((track) => {
+        track.enabled = !newVideoOff;
+      });
+    }
+
+    set({ isVideoOff: newVideoOff });
+  },
+
+  setScreenSharing: (sharing) => {
+    set({ isScreenSharing: sharing });
+  },
+
+  toggleChat: () => {
+    const { isChatOpen } = get();
+    set({
+      isChatOpen: !isChatOpen,
+      isParticipantsOpen: false,
+      isSettingsOpen: false,
+    });
+  },
+
+  toggleParticipants: () => {
+    const { isParticipantsOpen } = get();
+    set({
+      isParticipantsOpen: !isParticipantsOpen,
+      isChatOpen: false,
+      isSettingsOpen: false,
+    });
+  },
+
+  toggleSettings: () => {
+    const { isSettingsOpen } = get();
+    set({
+      isSettingsOpen: !isSettingsOpen,
+      isChatOpen: false,
+      isParticipantsOpen: false,
+    });
+  },
+
+  addMessage: (message) => {
+    const { messages } = get();
+    set({ messages: [...messages, message] });
+  },
+
+  setMessages: (messages) => {
+    set({ messages });
+  },
+
+  setTypingUser: (socketId, displayName, isTyping) => {
+    const { typingUsers } = get();
+    const newTypingUsers = new Map(typingUsers);
+
+    if (isTyping) {
+      newTypingUsers.set(socketId, displayName);
+    } else {
+      newTypingUsers.delete(socketId);
+    }
+
+    set({ typingUsers: newTypingUsers });
+  },
+
+  reset: () => {
+    // Stop all tracks before reset
+    const { localStream, screenStream } = get();
+    localStream?.getTracks().forEach((track) => track.stop());
+    screenStream?.getTracks().forEach((track) => track.stop());
+
+    set(initialState);
+  },
+}));
