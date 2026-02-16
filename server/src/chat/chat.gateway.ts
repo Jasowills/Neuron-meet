@@ -4,9 +4,9 @@ import {
   SubscribeMessage,
   ConnectedSocket,
   MessageBody,
-} from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
-import { ChatService } from './chat.service';
+} from "@nestjs/websockets";
+import { Server, Socket } from "socket.io";
+import { ChatService } from "./chat.service";
 
 interface ChatMessagePayload {
   roomId: string;
@@ -22,10 +22,10 @@ const typingUsers: Map<string, Map<string, NodeJS.Timeout>> = new Map();
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: "*",
     credentials: true,
   },
-  namespace: '/',
+  namespace: "/",
 })
 export class ChatGateway {
   @WebSocketServer()
@@ -33,7 +33,7 @@ export class ChatGateway {
 
   constructor(private chatService: ChatService) {}
 
-  @SubscribeMessage('chat-message')
+  @SubscribeMessage("chat-message")
   async handleChatMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: ChatMessagePayload,
@@ -42,10 +42,10 @@ export class ChatGateway {
 
     // Get user info from handshake or stored data
     const userId = client.handshake.auth?.userId;
-    const displayName = client.handshake.auth?.displayName || 'Guest';
+    const displayName = client.handshake.auth?.displayName || "Guest";
 
     if (!content || content.trim().length === 0) {
-      return { success: false, error: 'Message content is required' };
+      return { success: false, error: "Message content is required" };
     }
 
     try {
@@ -59,7 +59,7 @@ export class ChatGateway {
 
       // Broadcast to all in room (including sender)
       // Include socketId so clients can identify their own messages
-      this.server.to(roomId).emit('chat-message', {
+      this.server.to(roomId).emit("chat-message", {
         ...message,
         senderId: client.id, // Use socket ID for real-time identification
       });
@@ -69,40 +69,40 @@ export class ChatGateway {
 
       return { success: true, message };
     } catch (error) {
-      return { success: false, error: 'Failed to send message' };
+      return { success: false, error: "Failed to send message" };
     }
   }
 
-  @SubscribeMessage('typing-start')
+  @SubscribeMessage("typing-start")
   handleTypingStart(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: TypingPayload,
   ) {
     const { roomId } = data;
-    const displayName = client.handshake.auth?.displayName || 'Guest';
+    const displayName = client.handshake.auth?.displayName || "Guest";
 
     // Set up typing timeout (clear after 3 seconds)
     this.setTyping(roomId, client.id);
 
     // Broadcast typing indicator
-    client.to(roomId).emit('user-typing', {
+    client.to(roomId).emit("user-typing", {
       socketId: client.id,
       displayName,
       isTyping: true,
     });
   }
 
-  @SubscribeMessage('typing-stop')
+  @SubscribeMessage("typing-stop")
   handleTypingStop(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: TypingPayload,
   ) {
     const { roomId } = data;
-    const displayName = client.handshake.auth?.displayName || 'Guest';
+    const displayName = client.handshake.auth?.displayName || "Guest";
 
     this.clearTyping(roomId, client.id);
 
-    client.to(roomId).emit('user-typing', {
+    client.to(roomId).emit("user-typing", {
       socketId: client.id,
       displayName,
       isTyping: false,

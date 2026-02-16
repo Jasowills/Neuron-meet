@@ -193,13 +193,14 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
 
       socket.on("screen-share-started", async (data) => {
         updateParticipant(data.socketId, { isScreenSharing: true });
-        
+
         // Stop local screen share if someone else started (screen share takeover)
-        const { screenStream, localParticipant, localStream } = useMeetingStore.getState();
+        const { screenStream, localParticipant, localStream } =
+          useMeetingStore.getState();
         if (screenStream && localParticipant?.socketId !== data.socketId) {
           mediaManager.stopScreenShare();
           useMeetingStore.getState().setScreenStream(null);
-          
+
           // Restore camera video track in peer connections
           if (localStream) {
             const videoTrack = localStream.getVideoTracks()[0];
@@ -207,12 +208,14 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
               await pcManager.current.replaceVideoTrack(videoTrack);
             }
           }
-          
+
           const currentRoomId = useMeetingStore.getState().roomId;
           if (currentRoomId) {
             socketClient.emit("stop-screen-share", { roomId: currentRoomId });
           }
-          toast.info("Your screen share was stopped because someone else started sharing");
+          toast.info(
+            "Your screen share was stopped because someone else started sharing",
+          );
         }
       });
 
