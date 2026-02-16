@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { useAuthStore } from '@/store/useAuthStore';
 
-const API_URL = import.meta.env.VITE_API_URL || '';
+// Get API URL - empty/undefined means same-origin (relative /api path)
+const rawApiUrl = import.meta.env.VITE_API_URL || '';
+const API_URL = rawApiUrl === '/' ? '' : rawApiUrl.replace(/\/$/, '');
 
 export const api = axios.create({
   baseURL: `${API_URL}/api`,

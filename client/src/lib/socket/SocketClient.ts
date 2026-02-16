@@ -3,7 +3,9 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useMeetingStore } from "@/store/useMeetingStore";
 import { toast } from "@/store/useToastStore";
 
-const WS_URL = import.meta.env.VITE_WS_URL || "";
+// Get WS URL - empty/undefined means same-origin
+const rawWsUrl = import.meta.env.VITE_WS_URL || "";
+const WS_URL = rawWsUrl === "/" ? "" : rawWsUrl.replace(/\/$/, "");
 
 class SocketClient {
   private socket: Socket | null = null;
