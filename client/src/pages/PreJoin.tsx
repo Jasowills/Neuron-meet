@@ -49,12 +49,11 @@ export default function PreJoin() {
   useEffect(() => {
     const initMedia = async () => {
       try {
+        console.log("Initializing media...");
         const mediaStream = await mediaManager.getLocalStream();
+        console.log("Got media stream:", mediaStream);
+        console.log("Video tracks:", mediaStream.getVideoTracks());
         setStream(mediaStream);
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream;
-        }
 
         // Get devices
         const deviceList = await MediaManager.getDevices();
@@ -75,10 +74,19 @@ export default function PreJoin() {
   // Update video element when stream changes
   useEffect(() => {
     if (videoRef.current && stream) {
+      console.log("Attaching stream to video element");
       videoRef.current.srcObject = stream;
-      videoRef.current.play().catch((err) => {
-        console.error("Error playing video:", err);
-      });
+      
+      // Force play after a small delay to ensure element is ready
+      const playVideo = async () => {
+        try {
+          await videoRef.current?.play();
+          console.log("Video playing successfully");
+        } catch (err) {
+          console.error("Error playing video:", err);
+        }
+      };
+      playVideo();
     }
   }, [stream]);
 
