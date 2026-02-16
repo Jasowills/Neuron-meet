@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Video, Users, Shield, Zap } from 'lucide-react';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Video, Users, Shield, Zap } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function Home() {
-  const [roomCode, setRoomCode] = useState('');
+  const [roomCode, setRoomCode] = useState("");
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
@@ -61,7 +61,10 @@ export default function Home() {
 
           {/* Join/Create Actions */}
           <div className="flex flex-col gap-4 justify-center items-center mb-16 px-4 sm:px-0">
-            <form onSubmit={handleJoinMeeting} className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <form
+              onSubmit={handleJoinMeeting}
+              className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto"
+            >
               <input
                 type="text"
                 value={roomCode}
@@ -79,7 +82,7 @@ export default function Home() {
             </form>
             <span className="text-dark-500">or</span>
             <Link
-              to={user ? '/dashboard' : '/register'}
+              to={user ? "/dashboard" : "/register"}
               className="btn btn-primary btn-lg"
             >
               Start a meeting

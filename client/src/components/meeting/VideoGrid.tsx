@@ -68,7 +68,9 @@ export default function VideoGrid() {
       )}
 
       {/* Video grid */}
-      <div className={`flex-1 grid ${getGridClass()} gap-2 sm:gap-4 auto-rows-fr`}>
+      <div
+        className={`flex-1 grid ${getGridClass()} gap-2 sm:gap-4 auto-rows-fr`}
+      >
         {/* Local video */}
         {localParticipant && (
           <VideoTile
