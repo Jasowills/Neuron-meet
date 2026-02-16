@@ -58,7 +58,11 @@ export class ChatGateway {
       });
 
       // Broadcast to all in room (including sender)
-      this.server.to(roomId).emit('chat-message', message);
+      // Include socketId so clients can identify their own messages
+      this.server.to(roomId).emit('chat-message', {
+        ...message,
+        senderId: client.id, // Use socket ID for real-time identification
+      });
 
       // Clear typing indicator
       this.clearTyping(roomId, client.id);
