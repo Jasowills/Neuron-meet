@@ -103,15 +103,15 @@ export default function Meeting() {
       )}
 
       {/* Main content area */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden relative">
         {/* Video area */}
-        <div className="flex-1 p-4 overflow-hidden">
+        <div className="flex-1 p-2 sm:p-4 overflow-hidden">
           <VideoGrid />
         </div>
 
-        {/* Side panels */}
+        {/* Side panels - full screen on mobile, sidebar on desktop */}
         {(isChatOpen || isParticipantsOpen) && (
-          <div className="w-80 border-l border-dark-800 flex flex-col">
+          <div className="absolute inset-0 md:relative md:inset-auto w-full md:w-80 border-l border-dark-800 flex flex-col bg-dark-900 z-40">
             {isChatOpen && (
               <ChatPanel
                 onSendMessage={sendMessage}

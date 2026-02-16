@@ -60,14 +60,14 @@ export default function Home() {
           </p>
 
           {/* Join/Create Actions */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <form onSubmit={handleJoinMeeting} className="flex gap-2">
+          <div className="flex flex-col gap-4 justify-center items-center mb-16 px-4 sm:px-0">
+            <form onSubmit={handleJoinMeeting} className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <input
                 type="text"
                 value={roomCode}
                 onChange={(e) => setRoomCode(e.target.value)}
                 placeholder="Enter meeting code"
-                className="input w-64"
+                className="input w-full sm:w-64"
               />
               <button
                 type="submit"

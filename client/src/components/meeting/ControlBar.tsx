@@ -137,9 +137,9 @@ export default function ControlBar({
   const participantCount = participants.size + 1;
 
   return (
-    <div className="h-20 bg-dark-800 border-t border-dark-700 px-4 flex items-center justify-between">
-      {/* Left side - meeting info */}
-      <div className="flex items-center gap-4">
+    <div className="h-16 sm:h-20 bg-dark-800 border-t border-dark-700 px-2 sm:px-4 flex items-center justify-between">
+      {/* Left side - meeting info (hidden on mobile) */}
+      <div className="hidden sm:flex items-center gap-4">
         <div>
           <p className="text-white text-sm font-medium">Meeting Code</p>
           <button
@@ -158,7 +158,7 @@ export default function ControlBar({
       </div>
 
       {/* Center - main controls */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 flex-1 sm:flex-none justify-center">
         {/* Mic toggle */}
         <button
           onClick={onToggleMute}
@@ -189,10 +189,10 @@ export default function ControlBar({
           )}
         </button>
 
-        {/* Screen share */}
+        {/* Screen share - hidden on mobile */}
         <button
           onClick={handleScreenShare}
-          className={`btn btn-icon ${
+          className={`btn btn-icon hidden sm:flex ${
             isScreenSharing
               ? "bg-primary-600 hover:bg-primary-700"
               : "btn-secondary"
@@ -206,10 +206,10 @@ export default function ControlBar({
           )}
         </button>
 
-        {/* Hand raise */}
+        {/* Hand raise - hidden on small mobile */}
         <button
           onClick={onToggleHandRaise}
-          className={`btn btn-icon ${
+          className={`btn btn-icon hidden xs:flex ${
             isHandRaised
               ? "bg-yellow-500 hover:bg-yellow-600 animate-hand-pulse"
               : "btn-secondary"
@@ -222,7 +222,7 @@ export default function ControlBar({
         {/* Leave button */}
         <button
           onClick={onLeave}
-          className="btn btn-icon bg-red-600 hover:bg-red-700 ml-4"
+          className="btn btn-icon bg-red-600 hover:bg-red-700 ml-2 sm:ml-4"
           title="Leave meeting"
         >
           <PhoneOff className="w-5 h-5" />

@@ -20,14 +20,14 @@ export default function VideoGrid() {
 
   const totalParticipants = participantList.length + 1; // +1 for local
 
-  // Calculate grid layout
+  // Calculate grid layout - responsive
   const getGridClass = () => {
     if (totalParticipants === 1) return "grid-cols-1";
-    if (totalParticipants === 2) return "grid-cols-2";
-    if (totalParticipants <= 4) return "grid-cols-2";
-    if (totalParticipants <= 6) return "grid-cols-3";
-    if (totalParticipants <= 9) return "grid-cols-3";
-    return "grid-cols-4";
+    if (totalParticipants === 2) return "grid-cols-1 sm:grid-cols-2";
+    if (totalParticipants <= 4) return "grid-cols-1 sm:grid-cols-2";
+    if (totalParticipants <= 6) return "grid-cols-2 sm:grid-cols-3";
+    if (totalParticipants <= 9) return "grid-cols-2 sm:grid-cols-3";
+    return "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4";
   };
 
   return (
@@ -68,7 +68,7 @@ export default function VideoGrid() {
       )}
 
       {/* Video grid */}
-      <div className={`flex-1 grid ${getGridClass()} gap-4 auto-rows-fr`}>
+      <div className={`flex-1 grid ${getGridClass()} gap-2 sm:gap-4 auto-rows-fr`}>
         {/* Local video */}
         {localParticipant && (
           <VideoTile
