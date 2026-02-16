@@ -169,15 +169,16 @@ export default function PreJoin() {
           {/* Video Preview */}
           <div className="card">
             <div className="video-container bg-dark-800 mb-4">
-              {isVideoOn ? (
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-full h-full object-cover rounded-xl transform scale-x-[-1]"
-                />
-              ) : (
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className={`absolute inset-0 w-full h-full object-cover rounded-xl transform scale-x-[-1] ${
+                  isVideoOn ? "block" : "hidden"
+                }`}
+              />
+              {!isVideoOn && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-20 h-20 rounded-full bg-dark-700 flex items-center justify-center">
                     <VideoOff className="w-8 h-8 text-dark-400" />
