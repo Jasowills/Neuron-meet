@@ -15,7 +15,9 @@ async function bootstrap() {
 
   // Enable CORS
   app.enableCors({
-    origin: configService.get<string>("CORS_ORIGIN", "http://localhost:5173"),
+    origin: isProduction
+      ? true
+      : configService.get<string>("CORS_ORIGIN", "http://localhost:5173"),
     credentials: true,
   });
 
@@ -33,9 +35,18 @@ async function bootstrap() {
 
   // Serve static files in production (client build)
   if (isProduction) {
-    const clientPath = join(__dirname, "../..", "../client/dist");
+    const clientPath = join(__dirname, "../../client/dist");
     app.useStaticAssets(clientPath);
-    app.setViewEngine("html");
+
+    // SPA fallback - serve index.html for all non-API routes
+    const expressApp = app.getHttpAdapter().getInstance();
+    expressApp.get("*", (req: any, res: any, next: any) => {
+      // Skip API and socket.io routes
+      if (req.path.startsWith("/api") || req.path.startsWith("/socket.io")) {
+        return next();
+      }
+      res.sendFile(join(clientPath, "index.html"));
+    });
   }
 
   await app.listen(port);
