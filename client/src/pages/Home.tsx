@@ -25,19 +25,30 @@ export default function Home() {
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary-600 flex items-center justify-center">
                 <Video className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
               </div>
-              <span className="text-lg sm:text-xl font-bold text-white">Neuron Meet</span>
+              <span className="text-lg sm:text-xl font-bold text-white">
+                Neuron Meet
+              </span>
             </div>
             <nav className="flex items-center gap-2 sm:gap-4">
               {user ? (
-                <Link to="/dashboard" className="btn btn-primary btn-sm sm:btn-md">
+                <Link
+                  to="/dashboard"
+                  className="btn btn-primary btn-sm sm:btn-md"
+                >
                   Dashboard
                 </Link>
               ) : (
                 <>
-                  <Link to="/login" className="btn btn-ghost btn-sm sm:btn-md text-sm">
+                  <Link
+                    to="/login"
+                    className="btn btn-ghost btn-sm sm:btn-md text-sm"
+                  >
                     Sign In
                   </Link>
-                  <Link to="/register" className="btn btn-primary btn-sm sm:btn-md text-sm whitespace-nowrap">
+                  <Link
+                    to="/register"
+                    className="btn btn-primary btn-sm sm:btn-md text-sm whitespace-nowrap"
+                  >
                     Get Started
                   </Link>
                 </>
