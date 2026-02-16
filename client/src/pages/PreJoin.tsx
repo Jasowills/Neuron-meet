@@ -76,7 +76,7 @@ export default function PreJoin() {
     if (videoRef.current && stream) {
       console.log("Attaching stream to video element");
       videoRef.current.srcObject = stream;
-      
+
       // Force play after a small delay to ensure element is ready
       const playVideo = async () => {
         try {
