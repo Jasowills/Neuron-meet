@@ -1,9 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Video, VideoOff, Mic, MicOff, Settings, Loader2 } from 'lucide-react';
-import { useAuthStore } from '@/store/useAuthStore';
-import { mediaManager, MediaManager, MediaDevice } from '@/lib/webrtc/MediaManager';
-import { api } from '@/lib/api/client';
+import { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { Video, VideoOff, Mic, MicOff, Settings, Loader2 } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
+import {
+  mediaManager,
+  MediaManager,
+  MediaDevice,
+} from "@/lib/webrtc/MediaManager";
+import { api } from "@/lib/api/client";
 
 export default function PreJoin() {
   const { roomCode } = useParams<{ roomCode: string }>();
@@ -14,14 +18,14 @@ export default function PreJoin() {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isAudioOn, setIsAudioOn] = useState(true);
-  const [guestName, setGuestName] = useState('');
-  const [error, setError] = useState('');
+  const [guestName, setGuestName] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [roomInfo, setRoomInfo] = useState<any>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [devices, setDevices] = useState<MediaDevice[]>([]);
-  const [selectedCamera, setSelectedCamera] = useState('');
-  const [selectedMic, setSelectedMic] = useState('');
+  const [selectedCamera, setSelectedCamera] = useState("");
+  const [selectedMic, setSelectedMic] = useState("");
 
   // Fetch room info
   useEffect(() => {
@@ -31,7 +35,7 @@ export default function PreJoin() {
         setRoomInfo(response.data);
         setIsLoading(false);
       } catch (err: any) {
-        setError(err.response?.data?.message || 'Room not found');
+        setError(err.response?.data?.message || "Room not found");
         setIsLoading(false);
       }
     };
@@ -47,7 +51,7 @@ export default function PreJoin() {
       try {
         const mediaStream = await mediaManager.getLocalStream();
         setStream(mediaStream);
-        
+
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
         }
@@ -56,8 +60,8 @@ export default function PreJoin() {
         const deviceList = await MediaManager.getDevices();
         setDevices(deviceList);
       } catch (err) {
-        console.error('Error accessing media:', err);
-        setError('Could not access camera or microphone');
+        console.error("Error accessing media:", err);
+        setError("Could not access camera or microphone");
       }
     };
 
@@ -72,8 +76,8 @@ export default function PreJoin() {
   useEffect(() => {
     if (videoRef.current && stream) {
       videoRef.current.srcObject = stream;
-      videoRef.current.play().catch(err => {
-        console.error('Error playing video:', err);
+      videoRef.current.play().catch((err) => {
+        console.error("Error playing video:", err);
       });
     }
   }, [stream]);
@@ -90,7 +94,7 @@ export default function PreJoin() {
 
   const handleJoin = () => {
     if (!user && !guestName.trim()) {
-      setError('Please enter your name');
+      setError("Please enter your name");
       return;
     }
 
@@ -110,7 +114,7 @@ export default function PreJoin() {
       await mediaManager.switchCamera(deviceId);
       setStream(mediaManager.getLocalStreamRef());
     } catch (err) {
-      console.error('Error switching camera:', err);
+      console.error("Error switching camera:", err);
     }
   };
 
@@ -119,7 +123,7 @@ export default function PreJoin() {
     try {
       await mediaManager.switchMicrophone(deviceId);
     } catch (err) {
-      console.error('Error switching microphone:', err);
+      console.error("Error switching microphone:", err);
     }
   };
 
@@ -145,18 +149,19 @@ export default function PreJoin() {
     );
   }
 
-  const cameras = devices.filter(d => d.kind === 'videoinput');
-  const microphones = devices.filter(d => d.kind === 'audioinput');
+  const cameras = devices.filter((d) => d.kind === "videoinput");
+  const microphones = devices.filter((d) => d.kind === "audioinput");
 
   return (
     <div className="min-h-screen bg-dark-900 flex items-center justify-center p-4">
       <div className="max-w-4xl w-full">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-white mb-2">
-            {roomInfo?.name || 'Join Meeting'}
+            {roomInfo?.name || "Join Meeting"}
           </h1>
           <p className="text-dark-400">
-            Meeting code: <span className="text-white font-mono">{roomCode}</span>
+            Meeting code:{" "}
+            <span className="text-white font-mono">{roomCode}</span>
           </p>
         </div>
 
@@ -186,9 +191,9 @@ export default function PreJoin() {
               <button
                 onClick={toggleAudio}
                 className={`btn btn-icon ${
-                  isAudioOn ? 'btn-secondary' : 'btn-danger'
+                  isAudioOn ? "btn-secondary" : "btn-danger"
                 }`}
-                title={isAudioOn ? 'Mute' : 'Unmute'}
+                title={isAudioOn ? "Mute" : "Unmute"}
               >
                 {isAudioOn ? (
                   <Mic className="w-5 h-5" />
@@ -199,9 +204,9 @@ export default function PreJoin() {
               <button
                 onClick={toggleVideo}
                 className={`btn btn-icon ${
-                  isVideoOn ? 'btn-secondary' : 'btn-danger'
+                  isVideoOn ? "btn-secondary" : "btn-danger"
                 }`}
-                title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
+                title={isVideoOn ? "Turn off camera" : "Turn on camera"}
               >
                 {isVideoOn ? (
                   <Video className="w-5 h-5" />
@@ -223,7 +228,10 @@ export default function PreJoin() {
           <div className="card flex flex-col">
             {!user && (
               <div className="mb-4">
-                <label htmlFor="guestName" className="block text-sm font-medium text-dark-300 mb-1">
+                <label
+                  htmlFor="guestName"
+                  className="block text-sm font-medium text-dark-300 mb-1"
+                >
                   Your Name
                 </label>
                 <input
@@ -248,7 +256,10 @@ export default function PreJoin() {
             {showSettings && (
               <div className="mb-4 space-y-3">
                 <div>
-                  <label htmlFor="camera-select" className="block text-sm font-medium text-dark-300 mb-1">
+                  <label
+                    htmlFor="camera-select"
+                    className="block text-sm font-medium text-dark-300 mb-1"
+                  >
                     Camera
                   </label>
                   <select
@@ -258,7 +269,7 @@ export default function PreJoin() {
                     className="input"
                     aria-label="Select camera"
                   >
-                    {cameras.map(camera => (
+                    {cameras.map((camera) => (
                       <option key={camera.deviceId} value={camera.deviceId}>
                         {camera.label}
                       </option>
@@ -266,7 +277,10 @@ export default function PreJoin() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="mic-select" className="block text-sm font-medium text-dark-300 mb-1">
+                  <label
+                    htmlFor="mic-select"
+                    className="block text-sm font-medium text-dark-300 mb-1"
+                  >
                     Microphone
                   </label>
                   <select
@@ -276,7 +290,7 @@ export default function PreJoin() {
                     className="input"
                     aria-label="Select microphone"
                   >
-                    {microphones.map(mic => (
+                    {microphones.map((mic) => (
                       <option key={mic.deviceId} value={mic.deviceId}>
                         {mic.label}
                       </option>
@@ -300,10 +314,7 @@ export default function PreJoin() {
               >
                 Join Meeting
               </button>
-              <Link
-                to="/"
-                className="btn btn-ghost btn-md w-full text-center"
-              >
+              <Link to="/" className="btn btn-ghost btn-md w-full text-center">
                 Cancel
               </Link>
             </div>

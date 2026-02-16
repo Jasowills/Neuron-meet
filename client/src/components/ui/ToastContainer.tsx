@@ -1,5 +1,5 @@
-import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
-import { useToastStore, ToastType } from '@/store/useToastStore';
+import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from "lucide-react";
+import { useToastStore, ToastType } from "@/store/useToastStore";
 
 const icons: Record<ToastType, React.ReactNode> = {
   success: <CheckCircle className="w-5 h-5 text-green-400" />,
@@ -9,10 +9,10 @@ const icons: Record<ToastType, React.ReactNode> = {
 };
 
 const bgColors: Record<ToastType, string> = {
-  success: 'bg-green-500/10 border-green-500/30',
-  error: 'bg-red-500/10 border-red-500/30',
-  warning: 'bg-yellow-500/10 border-yellow-500/30',
-  info: 'bg-blue-500/10 border-blue-500/30',
+  success: "bg-green-500/10 border-green-500/30",
+  error: "bg-red-500/10 border-red-500/30",
+  warning: "bg-yellow-500/10 border-yellow-500/30",
+  info: "bg-blue-500/10 border-blue-500/30",
 };
 
 export default function ToastContainer() {

@@ -18,7 +18,7 @@ export class MediaManager {
       video: {
         width: { ideal: 1280 },
         height: { ideal: 720 },
-        facingMode: 'user',
+        facingMode: "user",
       },
       audio: {
         echoCancellation: true,
@@ -29,11 +29,11 @@ export class MediaManager {
 
     try {
       this.localStream = await navigator.mediaDevices.getUserMedia(
-        constraints || defaultConstraints
+        constraints || defaultConstraints,
       );
       return this.localStream;
     } catch (error) {
-      console.error('Error getting local stream:', error);
+      console.error("Error getting local stream:", error);
       throw error;
     }
   }
@@ -50,7 +50,7 @@ export class MediaManager {
       });
       return this.localStream;
     } catch (error) {
-      console.error('Error getting audio stream:', error);
+      console.error("Error getting audio stream:", error);
       throw error;
     }
   }
@@ -65,13 +65,13 @@ export class MediaManager {
       // Handle when user stops sharing via browser UI
       this.screenStream.getVideoTracks()[0].onended = () => {
         this.stopScreenShare();
-        window.dispatchEvent(new CustomEvent('screenshare-ended'));
+        window.dispatchEvent(new CustomEvent("screenshare-ended"));
       };
 
       return this.screenStream;
     } catch (error) {
-      if ((error as Error).name === 'NotAllowedError') {
-        throw new Error('Screen sharing permission denied');
+      if ((error as Error).name === "NotAllowedError") {
+        throw new Error("Screen sharing permission denied");
       }
       throw error;
     }
@@ -79,14 +79,14 @@ export class MediaManager {
 
   stopScreenShare(): void {
     if (this.screenStream) {
-      this.screenStream.getTracks().forEach(track => track.stop());
+      this.screenStream.getTracks().forEach((track) => track.stop());
       this.screenStream = null;
     }
   }
 
   stopLocalStream(): void {
     if (this.localStream) {
-      this.localStream.getTracks().forEach(track => track.stop());
+      this.localStream.getTracks().forEach((track) => track.stop());
       this.localStream = null;
     }
   }
@@ -106,7 +106,7 @@ export class MediaManager {
 
   toggleAudio(enabled: boolean): void {
     if (this.localStream) {
-      this.localStream.getAudioTracks().forEach(track => {
+      this.localStream.getAudioTracks().forEach((track) => {
         track.enabled = enabled;
       });
     }
@@ -114,7 +114,7 @@ export class MediaManager {
 
   toggleVideo(enabled: boolean): void {
     if (this.localStream) {
-      this.localStream.getVideoTracks().forEach(track => {
+      this.localStream.getVideoTracks().forEach((track) => {
         track.enabled = enabled;
       });
     }
@@ -124,22 +124,22 @@ export class MediaManager {
     if (!this.localStream) return;
 
     const oldVideoTrack = this.localStream.getVideoTracks()[0];
-    
+
     try {
       const newStream = await navigator.mediaDevices.getUserMedia({
         video: { deviceId: { exact: deviceId } },
       });
-      
+
       const newVideoTrack = newStream.getVideoTracks()[0];
-      
+
       // Replace track in stream
       this.localStream.removeTrack(oldVideoTrack);
       this.localStream.addTrack(newVideoTrack);
-      
+
       // Stop old track
       oldVideoTrack.stop();
     } catch (error) {
-      console.error('Error switching camera:', error);
+      console.error("Error switching camera:", error);
       throw error;
     }
   }
@@ -148,55 +148,61 @@ export class MediaManager {
     if (!this.localStream) return;
 
     const oldAudioTrack = this.localStream.getAudioTracks()[0];
-    
+
     try {
       const newStream = await navigator.mediaDevices.getUserMedia({
         audio: { deviceId: { exact: deviceId } },
       });
-      
+
       const newAudioTrack = newStream.getAudioTracks()[0];
-      
+
       // Replace track in stream
       this.localStream.removeTrack(oldAudioTrack);
       this.localStream.addTrack(newAudioTrack);
-      
+
       // Stop old track
       oldAudioTrack.stop();
     } catch (error) {
-      console.error('Error switching microphone:', error);
+      console.error("Error switching microphone:", error);
       throw error;
     }
   }
 
   static async getDevices(): Promise<MediaDevice[]> {
     const devices = await navigator.mediaDevices.enumerateDevices();
-    
+
     return devices
-      .filter(device => device.kind === 'videoinput' || device.kind === 'audioinput' || device.kind === 'audiooutput')
-      .map(device => ({
+      .filter(
+        (device) =>
+          device.kind === "videoinput" ||
+          device.kind === "audioinput" ||
+          device.kind === "audiooutput",
+      )
+      .map((device) => ({
         deviceId: device.deviceId,
-        label: device.label || `${device.kind} (${device.deviceId.slice(0, 8)})`,
+        label:
+          device.label || `${device.kind} (${device.deviceId.slice(0, 8)})`,
         kind: device.kind,
       }));
   }
 
   static async getCameras(): Promise<MediaDevice[]> {
     const devices = await MediaManager.getDevices();
-    return devices.filter(d => d.kind === 'videoinput');
+    return devices.filter((d) => d.kind === "videoinput");
   }
 
   static async getMicrophones(): Promise<MediaDevice[]> {
     const devices = await MediaManager.getDevices();
-    return devices.filter(d => d.kind === 'audioinput');
+    return devices.filter((d) => d.kind === "audioinput");
   }
 
   static async getSpeakers(): Promise<MediaDevice[]> {
     const devices = await MediaManager.getDevices();
-    return devices.filter(d => d.kind === 'audiooutput');
+    return devices.filter((d) => d.kind === "audiooutput");
   }
 
   static isScreenShareSupported(): boolean {
-    return 'getDisplayMedia' in navigator.mediaDevices;
+    return "getDisplayMedia" in navigator.mediaDevices;
   }
 }
 

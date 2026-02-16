@@ -247,7 +247,7 @@ export const useMeetingStore = create<MeetingState>((set, get) => ({
 
   addMessage: (message) => {
     const { messages, isChatOpen, unreadMessageCount } = get();
-    set({ 
+    set({
       messages: [...messages, message],
       unreadMessageCount: isChatOpen ? 0 : unreadMessageCount + 1,
     });

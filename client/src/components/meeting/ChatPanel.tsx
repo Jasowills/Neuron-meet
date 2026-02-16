@@ -62,7 +62,11 @@ export default function ChatPanel({
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-dark-700">
         <h3 className="text-white font-semibold">In-call messages</h3>
-        <button onClick={toggleChat} className="btn btn-ghost btn-icon" title="Close chat">
+        <button
+          onClick={toggleChat}
+          className="btn btn-ghost btn-icon"
+          title="Close chat"
+        >
           <X className="w-5 h-5" />
         </button>
       </div>

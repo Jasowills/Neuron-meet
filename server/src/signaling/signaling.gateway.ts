@@ -6,9 +6,9 @@ import {
   OnGatewayDisconnect,
   ConnectedSocket,
   MessageBody,
-} from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
-import { SignalingService } from './signaling.service';
+} from "@nestjs/websockets";
+import { Server, Socket } from "socket.io";
+import { SignalingService } from "./signaling.service";
 
 interface JoinRoomPayload {
   roomCode: string;
@@ -29,12 +29,14 @@ interface MediaTogglePayload {
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: "*",
     credentials: true,
   },
-  namespace: '/',
+  namespace: "/",
 })
-export class SignalingGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class SignalingGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
@@ -47,26 +49,31 @@ export class SignalingGateway implements OnGatewayConnection, OnGatewayDisconnec
   async handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
     const userData = this.signalingService.getUserData(client.id);
-    
+
     if (userData) {
       // Notify others in room
-      client.to(userData.roomId).emit('user-left', {
+      client.to(userData.roomId).emit("user-left", {
         socketId: client.id,
         userId: userData.userId,
       });
-      
+
       // Clean up
       this.signalingService.removeUser(client.id);
     }
   }
 
-  @SubscribeMessage('join-room')
+  @SubscribeMessage("join-room")
   async handleJoinRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: JoinRoomPayload,
   ) {
     const { roomCode, userId, displayName } = data;
-    console.log('Join room request:', { roomCode, userId, displayName, socketId: client.id });
+    console.log("Join room request:", {
+      roomCode,
+      userId,
+      displayName,
+      socketId: client.id,
+    });
 
     try {
       // Validate room exists and get room data
@@ -76,17 +83,19 @@ export class SignalingGateway implements OnGatewayConnection, OnGatewayDisconnec
         userId,
         displayName,
       );
-      
-      console.log('Room data:', roomData);
+
+      console.log("Room data:", roomData);
 
       // Join socket room
       client.join(roomData.roomId);
 
       // Get existing participants in room
-      const participants = this.signalingService.getRoomParticipants(roomData.roomId);
+      const participants = this.signalingService.getRoomParticipants(
+        roomData.roomId,
+      );
 
       // Notify others that a new user joined
-      client.to(roomData.roomId).emit('user-joined', {
+      client.to(roomData.roomId).emit("user-joined", {
         participant: {
           socketId: client.id,
           userId,
@@ -99,11 +108,11 @@ export class SignalingGateway implements OnGatewayConnection, OnGatewayDisconnec
       });
 
       // Emit room-joined event to the joining client
-      client.emit('room-joined', {
+      client.emit("room-joined", {
         roomId: roomData.roomId,
         roomCode,
         isHost: roomData.isHost,
-        participants: participants.filter(p => p.socketId !== client.id),
+        participants: participants.filter((p) => p.socketId !== client.id),
         messages: roomData.messages,
         settings: roomData.settings,
       });
@@ -113,14 +122,14 @@ export class SignalingGateway implements OnGatewayConnection, OnGatewayDisconnec
         roomId: roomData.roomId,
         roomCode,
         isHost: roomData.isHost,
-        participants: participants.filter(p => p.socketId !== client.id),
+        participants: participants.filter((p) => p.socketId !== client.id),
         messages: roomData.messages,
         settings: roomData.settings,
       };
     } catch (error) {
-      console.error('Join room error:', error.message);
-      client.emit('error', {
-        code: 'JOIN_FAILED',
+      console.error("Join room error:", error.message);
+      client.emit("error", {
+        code: "JOIN_FAILED",
         message: error.message,
       });
       return {
@@ -130,7 +139,7 @@ export class SignalingGateway implements OnGatewayConnection, OnGatewayDisconnec
     }
   }
 
-  @SubscribeMessage('leave-room')
+  @SubscribeMessage("leave-room")
   handleLeaveRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { roomId: string },
@@ -140,7 +149,7 @@ export class SignalingGateway implements OnGatewayConnection, OnGatewayDisconnec
 
     if (userData) {
       client.leave(roomId);
-      client.to(roomId).emit('user-left', {
+      client.to(roomId).emit("user-left", {
         socketId: client.id,
         userId: userData.userId,
       });
@@ -151,14 +160,14 @@ export class SignalingGateway implements OnGatewayConnection, OnGatewayDisconnec
   }
 
   // WebRTC Signaling
-  @SubscribeMessage('offer')
+  @SubscribeMessage("offer")
   handleOffer(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: SignalPayload,
   ) {
     const userData = this.signalingService.getUserData(client.id);
-    
-    this.server.to(data.targetId).emit('offer', {
+
+    this.server.to(data.targetId).emit("offer", {
       senderId: client.id,
       userId: userData?.userId,
       displayName: userData?.displayName,
@@ -166,113 +175,119 @@ export class SignalingGateway implements OnGatewayConnection, OnGatewayDisconnec
     });
   }
 
-  @SubscribeMessage('answer')
+  @SubscribeMessage("answer")
   handleAnswer(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: SignalPayload,
   ) {
-    this.server.to(data.targetId).emit('answer', {
+    this.server.to(data.targetId).emit("answer", {
       senderId: client.id,
       sdp: data.sdp,
     });
   }
 
-  @SubscribeMessage('ice-candidate')
+  @SubscribeMessage("ice-candidate")
   handleIceCandidate(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: SignalPayload,
   ) {
-    this.server.to(data.targetId).emit('ice-candidate', {
+    this.server.to(data.targetId).emit("ice-candidate", {
       senderId: client.id,
       candidate: data.candidate,
     });
   }
 
   // Media controls
-  @SubscribeMessage('toggle-audio')
+  @SubscribeMessage("toggle-audio")
   handleToggleAudio(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: MediaTogglePayload,
   ) {
-    this.signalingService.updateUserMedia(client.id, { isMuted: !data.enabled });
-    
-    client.to(data.roomId).emit('user-toggle-audio', {
+    this.signalingService.updateUserMedia(client.id, {
+      isMuted: !data.enabled,
+    });
+
+    client.to(data.roomId).emit("user-toggle-audio", {
       socketId: client.id,
       enabled: data.enabled,
     });
   }
 
-  @SubscribeMessage('toggle-video')
+  @SubscribeMessage("toggle-video")
   handleToggleVideo(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: MediaTogglePayload,
   ) {
-    this.signalingService.updateUserMedia(client.id, { isVideoOff: !data.enabled });
-    
-    client.to(data.roomId).emit('user-toggle-video', {
+    this.signalingService.updateUserMedia(client.id, {
+      isVideoOff: !data.enabled,
+    });
+
+    client.to(data.roomId).emit("user-toggle-video", {
       socketId: client.id,
       enabled: data.enabled,
     });
   }
 
-  @SubscribeMessage('start-screen-share')
+  @SubscribeMessage("start-screen-share")
   handleStartScreenShare(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { roomId: string },
   ) {
     this.signalingService.updateUserMedia(client.id, { isScreenSharing: true });
-    
-    client.to(data.roomId).emit('screen-share-started', {
+
+    client.to(data.roomId).emit("screen-share-started", {
       socketId: client.id,
     });
   }
 
-  @SubscribeMessage('stop-screen-share')
+  @SubscribeMessage("stop-screen-share")
   handleStopScreenShare(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { roomId: string },
   ) {
-    this.signalingService.updateUserMedia(client.id, { isScreenSharing: false });
-    
-    client.to(data.roomId).emit('screen-share-stopped', {
+    this.signalingService.updateUserMedia(client.id, {
+      isScreenSharing: false,
+    });
+
+    client.to(data.roomId).emit("screen-share-stopped", {
       socketId: client.id,
     });
   }
 
   // Hand raise
-  @SubscribeMessage('toggle-hand-raise')
+  @SubscribeMessage("toggle-hand-raise")
   handleToggleHandRaise(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { roomId: string; raised: boolean },
   ) {
     const userData = this.signalingService.getUserData(client.id);
-    
+
     if (data.raised) {
-      client.to(data.roomId).emit('user-hand-raised', {
+      client.to(data.roomId).emit("user-hand-raised", {
         socketId: client.id,
-        displayName: userData?.displayName || 'Participant',
+        displayName: userData?.displayName || "Participant",
       });
     } else {
-      client.to(data.roomId).emit('user-hand-lowered', {
+      client.to(data.roomId).emit("user-hand-lowered", {
         socketId: client.id,
       });
     }
   }
 
   // Host controls
-  @SubscribeMessage('mute-participant')
+  @SubscribeMessage("mute-participant")
   async handleMuteParticipant(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { roomId: string; targetId: string },
   ) {
     const userData = this.signalingService.getUserData(client.id);
-    
+
     if (!userData?.isHost) {
-      return { success: false, error: 'Not authorized' };
+      return { success: false, error: "Not authorized" };
     }
 
-    this.server.to(data.targetId).emit('force-mute', {});
-    this.server.to(data.roomId).emit('user-toggle-audio', {
+    this.server.to(data.targetId).emit("force-mute", {});
+    this.server.to(data.roomId).emit("user-toggle-audio", {
       socketId: data.targetId,
       enabled: false,
     });
@@ -280,38 +295,38 @@ export class SignalingGateway implements OnGatewayConnection, OnGatewayDisconnec
     return { success: true };
   }
 
-  @SubscribeMessage('remove-participant')
+  @SubscribeMessage("remove-participant")
   async handleRemoveParticipant(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { roomId: string; targetId: string },
   ) {
     const userData = this.signalingService.getUserData(client.id);
-    
+
     if (!userData?.isHost) {
-      return { success: false, error: 'Not authorized' };
+      return { success: false, error: "Not authorized" };
     }
 
-    this.server.to(data.targetId).emit('force-disconnect', {
-      reason: 'Removed by host',
+    this.server.to(data.targetId).emit("force-disconnect", {
+      reason: "Removed by host",
     });
 
     return { success: true };
   }
 
-  @SubscribeMessage('lock-room')
+  @SubscribeMessage("lock-room")
   async handleLockRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { roomId: string; locked: boolean },
   ) {
     const userData = this.signalingService.getUserData(client.id);
-    
+
     if (!userData?.isHost) {
-      return { success: false, error: 'Not authorized' };
+      return { success: false, error: "Not authorized" };
     }
 
     await this.signalingService.lockRoom(data.roomId, data.locked);
-    
-    client.to(data.roomId).emit('room-locked', {
+
+    client.to(data.roomId).emit("room-locked", {
       locked: data.locked,
     });
 

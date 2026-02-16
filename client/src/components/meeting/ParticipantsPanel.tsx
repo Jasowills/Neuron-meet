@@ -28,7 +28,11 @@ export default function ParticipantsPanel() {
         <h3 className="text-white font-semibold">
           Participants ({totalCount})
         </h3>
-        <button onClick={toggleParticipants} className="btn btn-ghost btn-icon" title="Close participants panel">
+        <button
+          onClick={toggleParticipants}
+          className="btn btn-ghost btn-icon"
+          title="Close participants panel"
+        >
           <X className="w-5 h-5" />
         </button>
       </div>

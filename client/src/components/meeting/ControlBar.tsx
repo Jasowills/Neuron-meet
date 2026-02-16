@@ -11,9 +11,9 @@ import {
   Hand,
   Copy,
   Check,
-} from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { useMeetingStore } from '@/store/useMeetingStore';
+} from "lucide-react";
+import { useState, useEffect } from "react";
+import { useMeetingStore } from "@/store/useMeetingStore";
 
 interface ControlBarProps {
   onToggleMute: () => void;
@@ -50,27 +50,30 @@ export default function ControlBar({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore if typing in an input
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      ) {
         return;
       }
 
       switch (e.key.toLowerCase()) {
-        case 'm':
+        case "m":
           onToggleMute();
           break;
-        case 'v':
+        case "v":
           onToggleVideo();
           break;
-        case 'h':
+        case "h":
           onToggleHandRaise();
           break;
-        case 'c':
+        case "c":
           toggleChat();
           break;
-        case 'p':
+        case "p":
           toggleParticipants();
           break;
-        case 'escape':
+        case "escape":
           // Show leave confirmation or close panels
           if (isChatOpen) toggleChat();
           else if (isParticipantsOpen) toggleParticipants();
@@ -78,38 +81,46 @@ export default function ControlBar({
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onToggleMute, onToggleVideo, onToggleHandRaise, toggleChat, toggleParticipants, isChatOpen, isParticipantsOpen]);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [
+    onToggleMute,
+    onToggleVideo,
+    onToggleHandRaise,
+    toggleChat,
+    toggleParticipants,
+    isChatOpen,
+    isParticipantsOpen,
+  ]);
 
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = async () => {
     if (!roomCode) {
-      console.error('No room code available');
+      console.error("No room code available");
       return;
     }
-    
+
     const link = `${window.location.origin}/join/${roomCode}`;
-    
+
     try {
       await navigator.clipboard.writeText(link);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       // Fallback for non-HTTPS or unsupported browsers
-      const textArea = document.createElement('textarea');
+      const textArea = document.createElement("textarea");
       textArea.value = link;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-9999px';
+      textArea.style.position = "fixed";
+      textArea.style.left = "-9999px";
       document.body.appendChild(textArea);
       textArea.select();
       try {
-        document.execCommand('copy');
+        document.execCommand("copy");
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       } catch (e) {
-        console.error('Failed to copy:', e);
+        console.error("Failed to copy:", e);
       }
       document.body.removeChild(textArea);
     }
@@ -136,7 +147,7 @@ export default function ControlBar({
             className="flex items-center gap-2 text-dark-400 hover:text-white text-sm"
             disabled={!roomCode}
           >
-            <span className="font-mono">{roomCode || 'Loading...'}</span>
+            <span className="font-mono">{roomCode || "Loading..."}</span>
             {copied ? (
               <Check className="w-4 h-4 text-green-500" />
             ) : (
@@ -152,9 +163,9 @@ export default function ControlBar({
         <button
           onClick={onToggleMute}
           className={`btn btn-icon ${
-            isMuted ? 'bg-red-500 hover:bg-red-600' : 'btn-secondary'
+            isMuted ? "bg-red-500 hover:bg-red-600" : "btn-secondary"
           }`}
-          title={isMuted ? 'Unmute (M)' : 'Mute (M)'}
+          title={isMuted ? "Unmute (M)" : "Mute (M)"}
         >
           {isMuted ? (
             <MicOff className="w-5 h-5" />
@@ -167,9 +178,9 @@ export default function ControlBar({
         <button
           onClick={onToggleVideo}
           className={`btn btn-icon ${
-            isVideoOff ? 'bg-red-500 hover:bg-red-600' : 'btn-secondary'
+            isVideoOff ? "bg-red-500 hover:bg-red-600" : "btn-secondary"
           }`}
-          title={isVideoOff ? 'Turn on camera (V)' : 'Turn off camera (V)'}
+          title={isVideoOff ? "Turn on camera (V)" : "Turn off camera (V)"}
         >
           {isVideoOff ? (
             <VideoOff className="w-5 h-5" />
@@ -182,9 +193,11 @@ export default function ControlBar({
         <button
           onClick={handleScreenShare}
           className={`btn btn-icon ${
-            isScreenSharing ? 'bg-primary-600 hover:bg-primary-700' : 'btn-secondary'
+            isScreenSharing
+              ? "bg-primary-600 hover:bg-primary-700"
+              : "btn-secondary"
           }`}
-          title={isScreenSharing ? 'Stop presenting (S)' : 'Present (S)'}
+          title={isScreenSharing ? "Stop presenting (S)" : "Present (S)"}
         >
           {isScreenSharing ? (
             <MonitorOff className="w-5 h-5" />
@@ -197,9 +210,11 @@ export default function ControlBar({
         <button
           onClick={onToggleHandRaise}
           className={`btn btn-icon ${
-            isHandRaised ? 'bg-yellow-500 hover:bg-yellow-600 animate-hand-pulse' : 'btn-secondary'
+            isHandRaised
+              ? "bg-yellow-500 hover:bg-yellow-600 animate-hand-pulse"
+              : "btn-secondary"
           }`}
-          title={isHandRaised ? 'Lower hand (H)' : 'Raise hand (H)'}
+          title={isHandRaised ? "Lower hand (H)" : "Raise hand (H)"}
         >
           <Hand className="w-5 h-5" />
         </button>
@@ -220,14 +235,14 @@ export default function ControlBar({
         <button
           onClick={toggleChat}
           className={`btn btn-icon relative ${
-            isChatOpen ? 'bg-primary-600' : 'btn-secondary'
+            isChatOpen ? "bg-primary-600" : "btn-secondary"
           }`}
           title="Chat (C)"
         >
           <MessageSquare className="w-5 h-5" />
           {unreadMessageCount > 0 && !isChatOpen && (
             <span className="absolute -top-1 -right-1 min-w-[1rem] h-4 bg-red-500 rounded-full text-xs flex items-center justify-center px-1">
-              {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
+              {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
             </span>
           )}
         </button>
@@ -236,7 +251,7 @@ export default function ControlBar({
         <button
           onClick={toggleParticipants}
           className={`btn btn-icon relative ${
-            isParticipantsOpen ? 'bg-primary-600' : 'btn-secondary'
+            isParticipantsOpen ? "bg-primary-600" : "btn-secondary"
           }`}
           title="Participants (P)"
         >

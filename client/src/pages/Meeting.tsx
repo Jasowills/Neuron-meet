@@ -1,28 +1,24 @@
-import { useEffect, useState } from 'react';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { useWebRTC } from '@/hooks/useWebRTC';
-import { useMeetingStore } from '@/store/useMeetingStore';
-import VideoGrid from '@/components/meeting/VideoGrid';
-import ControlBar from '@/components/meeting/ControlBar';
-import ChatPanel from '@/components/meeting/ChatPanel';
-import ParticipantsPanel from '@/components/meeting/ParticipantsPanel';
-import { Loader2, WifiOff } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { useWebRTC } from "@/hooks/useWebRTC";
+import { useMeetingStore } from "@/store/useMeetingStore";
+import VideoGrid from "@/components/meeting/VideoGrid";
+import ControlBar from "@/components/meeting/ControlBar";
+import ChatPanel from "@/components/meeting/ChatPanel";
+import ParticipantsPanel from "@/components/meeting/ParticipantsPanel";
+import { Loader2, WifiOff } from "lucide-react";
 
 export default function Meeting() {
   const { roomCode } = useParams<{ roomCode: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  
-  const displayName = searchParams.get('name') || 'Guest';
-  const [isJoining, setIsJoining] = useState(true);
-  const [error, setError] = useState('');
 
-  const {
-    isChatOpen,
-    isParticipantsOpen,
-    isReconnecting,
-    reset,
-  } = useMeetingStore();
+  const displayName = searchParams.get("name") || "Guest";
+  const [isJoining, setIsJoining] = useState(true);
+  const [error, setError] = useState("");
+
+  const { isChatOpen, isParticipantsOpen, isReconnecting, reset } =
+    useMeetingStore();
 
   const {
     joinRoom,
@@ -36,7 +32,7 @@ export default function Meeting() {
     sendTypingStart,
     sendTypingStop,
   } = useWebRTC({
-    roomCode: roomCode || '',
+    roomCode: roomCode || "",
     displayName,
   });
 
@@ -47,7 +43,7 @@ export default function Meeting() {
         await joinRoom();
         setIsJoining(false);
       } catch (err: any) {
-        setError(err.message || 'Failed to join meeting');
+        setError(err.message || "Failed to join meeting");
         setIsJoining(false);
       }
     };
@@ -65,7 +61,7 @@ export default function Meeting() {
   // Handle leaving
   const handleLeave = () => {
     leaveRoom();
-    navigate('/');
+    navigate("/");
   };
 
   if (isJoining) {
@@ -83,7 +79,10 @@ export default function Meeting() {
         <div className="card text-center max-w-md">
           <h1 className="text-2xl font-bold text-white mb-4">Failed to join</h1>
           <p className="text-dark-400 mb-6">{error}</p>
-          <button onClick={() => navigate('/')} className="btn btn-primary btn-md">
+          <button
+            onClick={() => navigate("/")}
+            className="btn btn-primary btn-md"
+          >
             Go Home
           </button>
         </div>

@@ -7,11 +7,15 @@ const getTurnServers = (): RTCIceServer[] => {
   const turnUrl = import.meta.env.VITE_TURN_URL;
   const turnUsername = import.meta.env.VITE_TURN_USERNAME;
   const turnCredential = import.meta.env.VITE_TURN_CREDENTIAL;
-  
+
   if (turnUrl && turnUsername && turnCredential) {
     return [
       { urls: turnUrl, username: turnUsername, credential: turnCredential },
-      { urls: turnUrl.replace('turn:', 'turns:').replace(':3478', ':5349'), username: turnUsername, credential: turnCredential },
+      {
+        urls: turnUrl.replace("turn:", "turns:").replace(":3478", ":5349"),
+        username: turnUsername,
+        credential: turnCredential,
+      },
     ];
   }
   return [];
@@ -19,11 +23,11 @@ const getTurnServers = (): RTCIceServer[] => {
 
 const DEFAULT_ICE_SERVERS: RTCIceServer[] = [
   // STUN servers (free, for NAT traversal discovery)
-  { urls: 'stun:stun.l.google.com:19302' },
-  { urls: 'stun:stun1.l.google.com:19302' },
-  { urls: 'stun:stun2.l.google.com:19302' },
-  { urls: 'stun:stun3.l.google.com:19302' },
-  { urls: 'stun:stun4.l.google.com:19302' },
+  { urls: "stun:stun.l.google.com:19302" },
+  { urls: "stun:stun1.l.google.com:19302" },
+  { urls: "stun:stun2.l.google.com:19302" },
+  { urls: "stun:stun3.l.google.com:19302" },
+  { urls: "stun:stun4.l.google.com:19302" },
   // Add TURN servers from environment if available
   ...getTurnServers(),
 ];
@@ -36,7 +40,10 @@ export class PeerConnectionManager {
   // Callbacks
   public onIceCandidate?: (peerId: string, candidate: RTCIceCandidate) => void;
   public onRemoteStream?: (peerId: string, stream: MediaStream) => void;
-  public onConnectionStateChange?: (peerId: string, state: RTCPeerConnectionState) => void;
+  public onConnectionStateChange?: (
+    peerId: string,
+    state: RTCPeerConnectionState,
+  ) => void;
   public onNegotiationNeeded?: (peerId: string) => void;
 
   constructor(config?: Partial<PeerConnectionConfig>) {
@@ -47,7 +54,7 @@ export class PeerConnectionManager {
 
   setLocalStream(stream: MediaStream | null): void {
     this.localStream = stream;
-    
+
     // Update tracks on existing connections
     if (stream) {
       this.peerConnections.forEach((pc) => {
@@ -62,9 +69,9 @@ export class PeerConnectionManager {
 
   private updateTracks(pc: RTCPeerConnection, stream: MediaStream): void {
     const senders = pc.getSenders();
-    
-    stream.getTracks().forEach(track => {
-      const sender = senders.find(s => s.track?.kind === track.kind);
+
+    stream.getTracks().forEach((track) => {
+      const sender = senders.find((s) => s.track?.kind === track.kind);
       if (sender) {
         sender.replaceTrack(track);
       } else {
@@ -83,7 +90,7 @@ export class PeerConnectionManager {
 
     // Add local tracks
     if (this.localStream) {
-      this.localStream.getTracks().forEach(track => {
+      this.localStream.getTracks().forEach((track) => {
         pc.addTrack(track, this.localStream!);
       });
     }
@@ -106,9 +113,9 @@ export class PeerConnectionManager {
     // Monitor connection state
     pc.onconnectionstatechange = () => {
       this.onConnectionStateChange?.(peerId, pc.connectionState);
-      
+
       // Clean up failed connections
-      if (pc.connectionState === 'failed' || pc.connectionState === 'closed') {
+      if (pc.connectionState === "failed" || pc.connectionState === "closed") {
         this.closePeerConnection(peerId);
       }
     };
@@ -124,7 +131,7 @@ export class PeerConnectionManager {
 
   async createOffer(peerId: string): Promise<RTCSessionDescriptionInit | null> {
     let pc = this.peerConnections.get(peerId);
-    
+
     if (!pc) {
       pc = await this.createPeerConnection(peerId);
     }
@@ -137,17 +144,17 @@ export class PeerConnectionManager {
       await pc.setLocalDescription(offer);
       return offer;
     } catch (error) {
-      console.error('Error creating offer:', error);
+      console.error("Error creating offer:", error);
       return null;
     }
   }
 
   async handleOffer(
     peerId: string,
-    offer: RTCSessionDescriptionInit
+    offer: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit | null> {
     let pc = this.peerConnections.get(peerId);
-    
+
     if (!pc) {
       pc = await this.createPeerConnection(peerId);
     }
@@ -158,46 +165,52 @@ export class PeerConnectionManager {
       await pc.setLocalDescription(answer);
       return answer;
     } catch (error) {
-      console.error('Error handling offer:', error);
+      console.error("Error handling offer:", error);
       return null;
     }
   }
 
-  async handleAnswer(peerId: string, answer: RTCSessionDescriptionInit): Promise<void> {
+  async handleAnswer(
+    peerId: string,
+    answer: RTCSessionDescriptionInit,
+  ): Promise<void> {
     const pc = this.peerConnections.get(peerId);
-    
+
     if (!pc) {
-      console.error('No peer connection found for:', peerId);
+      console.error("No peer connection found for:", peerId);
       return;
     }
 
     try {
       await pc.setRemoteDescription(new RTCSessionDescription(answer));
     } catch (error) {
-      console.error('Error handling answer:', error);
+      console.error("Error handling answer:", error);
     }
   }
 
-  async addIceCandidate(peerId: string, candidate: RTCIceCandidateInit): Promise<void> {
+  async addIceCandidate(
+    peerId: string,
+    candidate: RTCIceCandidateInit,
+  ): Promise<void> {
     const pc = this.peerConnections.get(peerId);
-    
+
     if (!pc) {
-      console.error('No peer connection found for:', peerId);
+      console.error("No peer connection found for:", peerId);
       return;
     }
 
     try {
       await pc.addIceCandidate(new RTCIceCandidate(candidate));
     } catch (error) {
-      console.error('Error adding ICE candidate:', error);
+      console.error("Error adding ICE candidate:", error);
     }
   }
 
   async replaceVideoTrack(newTrack: MediaStreamTrack): Promise<void> {
     const promises: Promise<void>[] = [];
-    
+
     this.peerConnections.forEach((pc) => {
-      const sender = pc.getSenders().find(s => s.track?.kind === 'video');
+      const sender = pc.getSenders().find((s) => s.track?.kind === "video");
       if (sender) {
         promises.push(sender.replaceTrack(newTrack));
       }

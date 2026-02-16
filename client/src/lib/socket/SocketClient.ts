@@ -1,9 +1,9 @@
-import { io, Socket } from 'socket.io-client';
-import { useAuthStore } from '@/store/useAuthStore';
-import { useMeetingStore } from '@/store/useMeetingStore';
-import { toast } from '@/store/useToastStore';
+import { io, Socket } from "socket.io-client";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useMeetingStore } from "@/store/useMeetingStore";
+import { toast } from "@/store/useToastStore";
 
-const WS_URL = import.meta.env.VITE_WS_URL || '';
+const WS_URL = import.meta.env.VITE_WS_URL || "";
 
 class SocketClient {
   private socket: Socket | null = null;
@@ -31,40 +31,40 @@ class SocketClient {
         userId: user?.id,
         displayName: user?.displayName || displayName,
       },
-      transports: ['websocket', 'polling'],
+      transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
     });
 
-    this.socket.on('connect', () => {
+    this.socket.on("connect", () => {
       const { isReconnecting, setReconnecting } = useMeetingStore.getState();
       if (isReconnecting) {
         setReconnecting(false);
-        toast.success('Reconnected to meeting');
+        toast.success("Reconnected to meeting");
       }
     });
 
-    this.socket.on('disconnect', (reason) => {
+    this.socket.on("disconnect", (reason) => {
       const { isConnected, setReconnecting } = useMeetingStore.getState();
-      if (isConnected && reason !== 'io client disconnect') {
+      if (isConnected && reason !== "io client disconnect") {
         setReconnecting(true);
-        toast.warning('Connection lost. Reconnecting...');
+        toast.warning("Connection lost. Reconnecting...");
       }
     });
 
-    this.socket.on('reconnect_attempt', (_attemptNumber) => {
+    this.socket.on("reconnect_attempt", (_attemptNumber) => {
       useMeetingStore.getState().setReconnecting(true);
     });
 
-    this.socket.on('reconnect_failed', () => {
+    this.socket.on("reconnect_failed", () => {
       useMeetingStore.getState().setReconnecting(false);
-      toast.error('Failed to reconnect. Please refresh the page.');
+      toast.error("Failed to reconnect. Please refresh the page.");
     });
 
-    this.socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
+    this.socket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
     });
 
     return this.socket;

@@ -76,15 +76,15 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
     try {
       // Get local media first
       const stream = await mediaManager.getLocalStream();
-      
+
       setLocalStream(stream);
       pcManager.current?.setLocalStream(stream);
 
       // Ensure video/audio tracks are enabled based on initial state
-      stream.getAudioTracks().forEach(track => {
+      stream.getAudioTracks().forEach((track) => {
         track.enabled = !isMuted;
       });
-      stream.getVideoTracks().forEach(track => {
+      stream.getVideoTracks().forEach((track) => {
         track.enabled = !isVideoOff;
       });
 
@@ -100,7 +100,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       });
 
       const joinTimeout = setTimeout(() => {
-        joinReject(new Error('Join room timeout - no response from server'));
+        joinReject(new Error("Join room timeout - no response from server"));
       }, 15000);
 
       socket.on("room-joined", (data) => {
@@ -138,7 +138,9 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       });
 
       socket.on("user-left", (data) => {
-        const participant = useMeetingStore.getState().participants.get(data.socketId);
+        const participant = useMeetingStore
+          .getState()
+          .participants.get(data.socketId);
         if (participant) {
           toast.info(`${participant.displayName} left the meeting`);
         }
@@ -148,7 +150,6 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
 
       // WebRTC signaling
       socket.on("offer", async (data) => {
-
         // Add participant if not exists
         addParticipant({
           socketId: data.senderId,
@@ -233,20 +234,20 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       socket.on("error", (data) => {
         console.error("Socket error:", data);
         clearTimeout(joinTimeout);
-        joinReject(new Error(data.message || 'Failed to join room'));
+        joinReject(new Error(data.message || "Failed to join room"));
       });
 
       // Wait for socket to connect before joining
       if (!socket.connected) {
         await new Promise<void>((resolve, reject) => {
-          socket.once('connect', () => {
+          socket.once("connect", () => {
             resolve();
           });
-          socket.once('connect_error', (err) => {
-            console.error('Socket connect error:', err);
-            reject(new Error('Failed to connect to server'));
+          socket.once("connect_error", (err) => {
+            console.error("Socket connect error:", err);
+            reject(new Error("Failed to connect to server"));
           });
-          setTimeout(() => reject(new Error('Connection timeout')), 10000);
+          setTimeout(() => reject(new Error("Connection timeout")), 10000);
         });
       }
 
@@ -411,14 +412,18 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
 
   // Toggle hand raise
   const toggleHandRaise = useCallback(() => {
-    const { roomId, isHandRaised, toggleHandRaise: storeToggleHandRaise } = useMeetingStore.getState();
+    const {
+      roomId,
+      isHandRaised,
+      toggleHandRaise: storeToggleHandRaise,
+    } = useMeetingStore.getState();
     storeToggleHandRaise();
-    
+
     if (roomId) {
       socketClient.emit("toggle-hand-raise", { roomId, raised: !isHandRaised });
     }
-    
-    toast.info(!isHandRaised ? 'Hand raised' : 'Hand lowered');
+
+    toast.info(!isHandRaised ? "Hand raised" : "Hand lowered");
   }, []);
 
   return {
