@@ -6,7 +6,7 @@ import VideoGrid from '@/components/meeting/VideoGrid';
 import ControlBar from '@/components/meeting/ControlBar';
 import ChatPanel from '@/components/meeting/ChatPanel';
 import ParticipantsPanel from '@/components/meeting/ParticipantsPanel';
-import { Loader2 } from 'lucide-react';
+import { Loader2, WifiOff } from 'lucide-react';
 
 export default function Meeting() {
   const { roomCode } = useParams<{ roomCode: string }>();
@@ -18,9 +18,9 @@ export default function Meeting() {
   const [error, setError] = useState('');
 
   const {
-    isConnected,
     isChatOpen,
     isParticipantsOpen,
+    isReconnecting,
     reset,
   } = useMeetingStore();
 
@@ -29,6 +29,7 @@ export default function Meeting() {
     leaveRoom,
     toggleMute,
     toggleVideo,
+    toggleHandRaise,
     startScreenShare,
     stopScreenShare,
     sendMessage,
@@ -92,6 +93,16 @@ export default function Meeting() {
 
   return (
     <div className="h-screen bg-dark-900 flex flex-col">
+      {/* Reconnection overlay */}
+      {isReconnecting && (
+        <div className="absolute inset-0 bg-black/70 z-50 flex flex-col items-center justify-center">
+          <WifiOff className="w-12 h-12 text-yellow-500 mb-4" />
+          <p className="text-white text-lg font-medium mb-2">Connection lost</p>
+          <p className="text-dark-400">Attempting to reconnect...</p>
+          <Loader2 className="w-6 h-6 animate-spin text-primary-500 mt-4" />
+        </div>
+      )}
+
       {/* Main content area */}
       <div className="flex-1 flex overflow-hidden">
         {/* Video area */}
@@ -120,6 +131,7 @@ export default function Meeting() {
         onToggleVideo={toggleVideo}
         onStartScreenShare={startScreenShare}
         onStopScreenShare={stopScreenShare}
+        onToggleHandRaise={toggleHandRaise}
         onLeave={handleLeave}
       />
     </div>

@@ -2,16 +2,35 @@ export interface PeerConnectionConfig {
   iceServers: RTCIceServer[];
 }
 
+// Get TURN server config from environment variables if available
+const getTurnServers = (): RTCIceServer[] => {
+  const turnUrl = import.meta.env.VITE_TURN_URL;
+  const turnUsername = import.meta.env.VITE_TURN_USERNAME;
+  const turnCredential = import.meta.env.VITE_TURN_CREDENTIAL;
+  
+  if (turnUrl && turnUsername && turnCredential) {
+    return [
+      { urls: turnUrl, username: turnUsername, credential: turnCredential },
+      { urls: turnUrl.replace('turn:', 'turns:').replace(':3478', ':5349'), username: turnUsername, credential: turnCredential },
+    ];
+  }
+  return [];
+};
+
 const DEFAULT_ICE_SERVERS: RTCIceServer[] = [
+  // STUN servers (free, for NAT traversal discovery)
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
   { urls: 'stun:stun2.l.google.com:19302' },
+  { urls: 'stun:stun3.l.google.com:19302' },
+  { urls: 'stun:stun4.l.google.com:19302' },
+  // Add TURN servers from environment if available
+  ...getTurnServers(),
 ];
 
 export class PeerConnectionManager {
   private peerConnections: Map<string, RTCPeerConnection> = new Map();
   private localStream: MediaStream | null = null;
-  private screenStream: MediaStream | null = null;
   private config: PeerConnectionConfig;
 
   // Callbacks
@@ -31,14 +50,14 @@ export class PeerConnectionManager {
     
     // Update tracks on existing connections
     if (stream) {
-      this.peerConnections.forEach((pc, peerId) => {
+      this.peerConnections.forEach((pc) => {
         this.updateTracks(pc, stream);
       });
     }
   }
 
-  setScreenStream(stream: MediaStream | null): void {
-    this.screenStream = stream;
+  setScreenStream(_stream: MediaStream | null): void {
+    // Screen stream is managed by MediaManager
   }
 
   private updateTracks(pc: RTCPeerConnection, stream: MediaStream): void {
@@ -196,7 +215,7 @@ export class PeerConnectionManager {
   }
 
   closeAll(): void {
-    this.peerConnections.forEach((pc, peerId) => {
+    this.peerConnections.forEach((pc) => {
       pc.close();
     });
     this.peerConnections.clear();

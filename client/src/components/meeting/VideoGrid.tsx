@@ -11,15 +11,8 @@ export default function VideoGrid() {
     screenStream,
     isMuted,
     isVideoOff,
+    isHandRaised,
   } = useMeetingStore();
-
-  // Debug logging
-  console.log('VideoGrid state:', { 
-    hasLocalStream: !!localStream, 
-    isVideoOff, 
-    isMuted,
-    localParticipant: localParticipant?.displayName 
-  });
 
   const participantList = useMemo(() => {
     return Array.from(participants.values());
@@ -84,6 +77,7 @@ export default function VideoGrid() {
             isLocal
             isMuted={isMuted}
             isVideoOff={isVideoOff}
+            isHandRaised={isHandRaised}
           />
         )}
 
@@ -95,6 +89,7 @@ export default function VideoGrid() {
             stream={participant.stream}
             isMuted={participant.isMuted}
             isVideoOff={participant.isVideoOff}
+            isHandRaised={participant.isHandRaised}
           />
         ))}
       </div>

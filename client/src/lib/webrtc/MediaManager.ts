@@ -58,9 +58,7 @@ export class MediaManager {
   async startScreenShare(): Promise<MediaStream> {
     try {
       this.screenStream = await navigator.mediaDevices.getDisplayMedia({
-        video: {
-          cursor: 'always',
-        },
+        video: true,
         audio: true,
       });
 

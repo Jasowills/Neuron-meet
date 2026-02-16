@@ -8,6 +8,7 @@ export interface Participant {
   isMuted: boolean;
   isVideoOff: boolean;
   isScreenSharing: boolean;
+  isHandRaised: boolean;
   stream?: MediaStream;
 }
 
@@ -52,10 +53,15 @@ interface MeetingState {
   isChatOpen: boolean;
   isParticipantsOpen: boolean;
   isSettingsOpen: boolean;
+  isReconnecting: boolean;
 
   // Chat
   messages: ChatMessage[];
   typingUsers: Map<string, string>;
+  unreadMessageCount: number;
+
+  // Hand raise
+  isHandRaised: boolean;
 
   // Actions
   setRoomInfo: (
@@ -90,6 +96,11 @@ interface MeetingState {
     isTyping: boolean,
   ) => void;
 
+  toggleHandRaise: () => void;
+  setParticipantHandRaise: (socketId: string, isRaised: boolean) => void;
+  setReconnecting: (reconnecting: boolean) => void;
+  clearUnreadCount: () => void;
+
   reset: () => void;
 }
 
@@ -99,6 +110,7 @@ const initialState = {
   isHost: false,
   isConnected: false,
   isLocked: false,
+  isReconnecting: false,
   settings: null,
   participants: new Map(),
   localParticipant: null,
@@ -107,11 +119,13 @@ const initialState = {
   isMuted: false,
   isVideoOff: false,
   isScreenSharing: false,
+  isHandRaised: false,
   isChatOpen: false,
   isParticipantsOpen: false,
   isSettingsOpen: false,
   messages: [],
   typingUsers: new Map(),
+  unreadMessageCount: 0,
 };
 
 export const useMeetingStore = create<MeetingState>((set, get) => ({
@@ -209,6 +223,7 @@ export const useMeetingStore = create<MeetingState>((set, get) => ({
       isChatOpen: !isChatOpen,
       isParticipantsOpen: false,
       isSettingsOpen: false,
+      unreadMessageCount: !isChatOpen ? 0 : get().unreadMessageCount,
     });
   },
 
@@ -231,8 +246,11 @@ export const useMeetingStore = create<MeetingState>((set, get) => ({
   },
 
   addMessage: (message) => {
-    const { messages } = get();
-    set({ messages: [...messages, message] });
+    const { messages, isChatOpen, unreadMessageCount } = get();
+    set({ 
+      messages: [...messages, message],
+      unreadMessageCount: isChatOpen ? 0 : unreadMessageCount + 1,
+    });
   },
 
   setMessages: (messages) => {
@@ -250,6 +268,29 @@ export const useMeetingStore = create<MeetingState>((set, get) => ({
     }
 
     set({ typingUsers: newTypingUsers });
+  },
+
+  toggleHandRaise: () => {
+    const { isHandRaised } = get();
+    set({ isHandRaised: !isHandRaised });
+  },
+
+  setParticipantHandRaise: (socketId, isRaised) => {
+    const { participants } = get();
+    const participant = participants.get(socketId);
+    if (participant) {
+      const newParticipants = new Map(participants);
+      newParticipants.set(socketId, { ...participant, isHandRaised: isRaised });
+      set({ participants: newParticipants });
+    }
+  },
+
+  setReconnecting: (reconnecting) => {
+    set({ isReconnecting: reconnecting });
+  },
+
+  clearUnreadCount: () => {
+    set({ unreadMessageCount: 0 });
   },
 
   reset: () => {

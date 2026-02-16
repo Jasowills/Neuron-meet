@@ -239,6 +239,26 @@ export class SignalingGateway implements OnGatewayConnection, OnGatewayDisconnec
     });
   }
 
+  // Hand raise
+  @SubscribeMessage('toggle-hand-raise')
+  handleToggleHandRaise(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: { roomId: string; raised: boolean },
+  ) {
+    const userData = this.signalingService.getUserData(client.id);
+    
+    if (data.raised) {
+      client.to(data.roomId).emit('user-hand-raised', {
+        socketId: client.id,
+        displayName: userData?.displayName || 'Participant',
+      });
+    } else {
+      client.to(data.roomId).emit('user-hand-lowered', {
+        socketId: client.id,
+      });
+    }
+  }
+
   // Host controls
   @SubscribeMessage('mute-participant')
   async handleMuteParticipant(

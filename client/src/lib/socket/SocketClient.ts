@@ -1,5 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useMeetingStore } from '@/store/useMeetingStore';
+import { toast } from '@/store/useToastStore';
 
 const WS_URL = import.meta.env.VITE_WS_URL || '';
 
@@ -31,16 +33,34 @@ class SocketClient {
       },
       transports: ['websocket', 'polling'],
       reconnection: true,
-      reconnectionAttempts: 5,
+      reconnectionAttempts: 10,
       reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
     });
 
     this.socket.on('connect', () => {
-      console.log('Socket connected:', this.socket?.id);
+      const { isReconnecting, setReconnecting } = useMeetingStore.getState();
+      if (isReconnecting) {
+        setReconnecting(false);
+        toast.success('Reconnected to meeting');
+      }
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.log('Socket disconnected:', reason);
+      const { isConnected, setReconnecting } = useMeetingStore.getState();
+      if (isConnected && reason !== 'io client disconnect') {
+        setReconnecting(true);
+        toast.warning('Connection lost. Reconnecting...');
+      }
+    });
+
+    this.socket.on('reconnect_attempt', (_attemptNumber) => {
+      useMeetingStore.getState().setReconnecting(true);
+    });
+
+    this.socket.on('reconnect_failed', () => {
+      useMeetingStore.getState().setReconnecting(false);
+      toast.error('Failed to reconnect. Please refresh the page.');
     });
 
     this.socket.on('connect_error', (error) => {

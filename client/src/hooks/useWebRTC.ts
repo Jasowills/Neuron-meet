@@ -4,6 +4,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { socketClient } from "@/lib/socket/SocketClient";
 import { PeerConnectionManager } from "@/lib/webrtc/PeerConnection";
 import { mediaManager } from "@/lib/webrtc/MediaManager";
+import { toast } from "@/store/useToastStore";
 
 interface UseWebRTCOptions {
   roomCode: string;
@@ -23,6 +24,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
     removeParticipant,
     updateParticipant,
     setParticipantStream,
+    setParticipantHandRaise,
     addMessage,
     setMessages,
     setTypingUser,
@@ -44,12 +46,11 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
     };
 
     pcManager.current.onRemoteStream = (peerId, stream) => {
-      console.log("Received remote stream from:", peerId);
       setParticipantStream(peerId, stream);
     };
 
-    pcManager.current.onConnectionStateChange = (peerId, state) => {
-      console.log(`Connection state for ${peerId}: ${state}`);
+    pcManager.current.onConnectionStateChange = (_peerId, _state) => {
+      // Connection state changed - can be used for debugging
     };
 
     return () => {
@@ -75,9 +76,6 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
     try {
       // Get local media first
       const stream = await mediaManager.getLocalStream();
-      console.log('Local stream acquired:', stream);
-      console.log('Video tracks:', stream.getVideoTracks().length);
-      console.log('Audio tracks:', stream.getAudioTracks().length);
       
       setLocalStream(stream);
       pcManager.current?.setLocalStream(stream);
@@ -106,7 +104,6 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       }, 15000);
 
       socket.on("room-joined", (data) => {
-        console.log("Room joined:", data);
         clearTimeout(joinTimeout);
         setRoomInfo(data.roomId, roomCode, data.isHost, data.settings);
         setMessages(data.messages || []);
@@ -121,6 +118,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
           isMuted,
           isVideoOff,
           isScreenSharing: false,
+          isHandRaised: false,
         });
 
         // Add existing participants and create offers
@@ -134,20 +132,22 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       });
 
       socket.on("user-joined", (data) => {
-        console.log("User joined:", data);
         addParticipant(data.participant);
+        toast.info(`${data.participant.displayName} joined the meeting`);
         // The new user will send us an offer
       });
 
       socket.on("user-left", (data) => {
-        console.log("User left:", data);
+        const participant = useMeetingStore.getState().participants.get(data.socketId);
+        if (participant) {
+          toast.info(`${participant.displayName} left the meeting`);
+        }
         removeParticipant(data.socketId);
         pcManager.current?.closePeerConnection(data.socketId);
       });
 
       // WebRTC signaling
       socket.on("offer", async (data) => {
-        console.log("Received offer from:", data.senderId);
 
         // Add participant if not exists
         addParticipant({
@@ -158,6 +158,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
           isMuted: false,
           isVideoOff: false,
           isScreenSharing: false,
+          isHandRaised: false,
         });
 
         const answer = await pcManager.current?.handleOffer(
@@ -173,7 +174,6 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       });
 
       socket.on("answer", async (data) => {
-        console.log("Received answer from:", data.senderId);
         await pcManager.current?.handleAnswer(data.senderId, data.sdp);
       });
 
@@ -198,6 +198,16 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
         updateParticipant(data.socketId, { isScreenSharing: false });
       });
 
+      // Hand raise events
+      socket.on("user-hand-raised", (data) => {
+        setParticipantHandRaise(data.socketId, true);
+        toast.info(`${data.displayName} raised their hand`);
+      });
+
+      socket.on("user-hand-lowered", (data) => {
+        setParticipantHandRaise(data.socketId, false);
+      });
+
       // Chat events
       socket.on("chat-message", (message) => {
         addMessage(message);
@@ -216,8 +226,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
         }
       });
 
-      socket.on("force-disconnect", (data) => {
-        console.log("Disconnected by host:", data.reason);
+      socket.on("force-disconnect", (_data) => {
         leaveRoom();
       });
 
@@ -231,7 +240,6 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       if (!socket.connected) {
         await new Promise<void>((resolve, reject) => {
           socket.once('connect', () => {
-            console.log('Socket connected, now joining room');
             resolve();
           });
           socket.once('connect_error', (err) => {
@@ -243,7 +251,6 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       }
 
       // Join the room and wait for confirmation
-      console.log('Emitting join-room:', { roomCode, userId: user?.id, displayName: user?.displayName || displayName });
       socket.emit("join-room", {
         roomCode,
         userId: user?.id,
@@ -402,11 +409,24 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
     }
   }, []);
 
+  // Toggle hand raise
+  const toggleHandRaise = useCallback(() => {
+    const { roomId, isHandRaised, toggleHandRaise: storeToggleHandRaise } = useMeetingStore.getState();
+    storeToggleHandRaise();
+    
+    if (roomId) {
+      socketClient.emit("toggle-hand-raise", { roomId, raised: !isHandRaised });
+    }
+    
+    toast.info(!isHandRaised ? 'Hand raised' : 'Hand lowered');
+  }, []);
+
   return {
     joinRoom,
     leaveRoom,
     toggleMute,
     toggleVideo,
+    toggleHandRaise,
     startScreenShare,
     stopScreenShare,
     sendMessage,

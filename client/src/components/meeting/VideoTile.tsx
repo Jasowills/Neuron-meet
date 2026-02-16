@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
-import { MicOff, Crown } from 'lucide-react';
-import { Participant } from '@/store/useMeetingStore';
+import { useEffect, useRef } from "react";
+import { MicOff, Crown, Hand } from "lucide-react";
+import { Participant } from "@/store/useMeetingStore";
 
 interface VideoTileProps {
   participant: Participant;
@@ -8,6 +8,7 @@ interface VideoTileProps {
   isLocal?: boolean;
   isMuted?: boolean;
   isVideoOff?: boolean;
+  isHandRaised?: boolean;
 }
 
 export default function VideoTile({
@@ -16,6 +17,7 @@ export default function VideoTile({
   isLocal = false,
   isMuted = false,
   isVideoOff = false,
+  isHandRaised = false,
 }: VideoTileProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -28,21 +30,12 @@ export default function VideoTile({
   // Get initials for avatar
   const getInitials = (name: string) => {
     return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
       .toUpperCase()
       .slice(0, 2);
   };
-
-  // Debug log
-  console.log('VideoTile render:', { 
-    displayName: participant.displayName, 
-    isLocal, 
-    isVideoOff, 
-    hasStream: !!stream,
-    streamTracks: stream?.getTracks().length 
-  });
 
   return (
     <div className="video-container relative group">
@@ -53,7 +46,7 @@ export default function VideoTile({
           autoPlay
           playsInline
           muted={isLocal}
-          className={`w-full h-full object-cover ${isLocal ? 'transform scale-x-[-1]' : ''}`}
+          className={`w-full h-full object-cover ${isLocal ? "transform scale-x-[-1]" : ""}`}
         />
       ) : (
         <div className="absolute inset-0 flex items-center justify-center bg-dark-800">
@@ -72,10 +65,15 @@ export default function VideoTile({
             )}
             <span className="text-white text-sm font-medium truncate">
               {participant.displayName}
-              {isLocal && ' (You)'}
+              {isLocal && " (You)"}
             </span>
           </div>
           <div className="flex items-center gap-1">
+            {isHandRaised && (
+              <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center animate-hand-pulse">
+                <Hand className="w-3 h-3 text-white" />
+              </div>
+            )}
             {isMuted && (
               <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center">
                 <MicOff className="w-3 h-3 text-white" />
@@ -84,6 +82,16 @@ export default function VideoTile({
           </div>
         </div>
       </div>
+
+      {/* Hand raised indicator at top */}
+      {isHandRaised && (
+        <div className="absolute top-2 right-2">
+          <div className="px-2 py-1 bg-yellow-500 rounded-full text-xs text-white font-medium flex items-center gap-1 animate-hand-pulse">
+            <Hand className="w-3 h-3" />
+            <span>Hand raised</span>
+          </div>
+        </div>
+      )}
 
       {/* Speaking indicator (placeholder) */}
       {!isMuted && (

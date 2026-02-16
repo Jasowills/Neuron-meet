@@ -45,15 +45,11 @@ export default function PreJoin() {
   useEffect(() => {
     const initMedia = async () => {
       try {
-        console.log('Requesting media stream...');
         const mediaStream = await mediaManager.getLocalStream();
-        console.log('Media stream acquired:', mediaStream);
-        console.log('Video tracks:', mediaStream.getVideoTracks());
         setStream(mediaStream);
         
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
-          console.log('Video element srcObject set');
         }
 
         // Get devices
@@ -252,13 +248,15 @@ export default function PreJoin() {
             {showSettings && (
               <div className="mb-4 space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-dark-300 mb-1">
+                  <label htmlFor="camera-select" className="block text-sm font-medium text-dark-300 mb-1">
                     Camera
                   </label>
                   <select
+                    id="camera-select"
                     value={selectedCamera}
                     onChange={(e) => handleCameraChange(e.target.value)}
                     className="input"
+                    aria-label="Select camera"
                   >
                     {cameras.map(camera => (
                       <option key={camera.deviceId} value={camera.deviceId}>
@@ -268,13 +266,15 @@ export default function PreJoin() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-dark-300 mb-1">
+                  <label htmlFor="mic-select" className="block text-sm font-medium text-dark-300 mb-1">
                     Microphone
                   </label>
                   <select
+                    id="mic-select"
                     value={selectedMic}
                     onChange={(e) => handleMicChange(e.target.value)}
                     className="input"
+                    aria-label="Select microphone"
                   >
                     {microphones.map(mic => (
                       <option key={mic.deviceId} value={mic.deviceId}>

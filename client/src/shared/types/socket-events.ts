@@ -114,7 +114,3 @@ export interface ChatMessagePayload {
   type: "TEXT" | "FILE" | "SYSTEM";
   timestamp: string;
 }
-
-// RTCSessionDescriptionInit and RTCIceCandidateInit are browser types
-// We keep them as-is for type compatibility
-export type { RTCSessionDescriptionInit, RTCIceCandidateInit };

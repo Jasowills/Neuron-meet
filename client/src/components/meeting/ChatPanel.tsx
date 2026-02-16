@@ -55,13 +55,6 @@ export default function ChatPanel({
     }
   };
 
-  const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const typingUsersList = Array.from(typingUsers.values());
 
   return (
@@ -69,7 +62,7 @@ export default function ChatPanel({
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-dark-700">
         <h3 className="text-white font-semibold">In-call messages</h3>
-        <button onClick={toggleChat} className="btn btn-ghost btn-icon">
+        <button onClick={toggleChat} className="btn btn-ghost btn-icon" title="Close chat">
           <X className="w-5 h-5" />
         </button>
       </div>
@@ -118,6 +111,7 @@ export default function ChatPanel({
             type="submit"
             disabled={!message.trim()}
             className="btn btn-primary btn-icon"
+            title="Send message"
           >
             <Send className="w-5 h-5" />
           </button>

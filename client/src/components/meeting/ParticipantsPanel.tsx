@@ -1,4 +1,4 @@
-import { X, Crown, MicOff, VideoOff, MoreVertical } from "lucide-react";
+import { X, Crown, MicOff, VideoOff, MoreVertical, Hand } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useMeetingStore, Participant } from "@/store/useMeetingStore";
 import { socketClient } from "@/lib/socket/SocketClient";
@@ -12,6 +12,7 @@ export default function ParticipantsPanel() {
     roomId,
     isMuted,
     isVideoOff,
+    isHandRaised,
   } = useMeetingStore();
 
   const participantList = useMemo(() => {
@@ -27,7 +28,7 @@ export default function ParticipantsPanel() {
         <h3 className="text-white font-semibold">
           Participants ({totalCount})
         </h3>
-        <button onClick={toggleParticipants} className="btn btn-ghost btn-icon">
+        <button onClick={toggleParticipants} className="btn btn-ghost btn-icon" title="Close participants panel">
           <X className="w-5 h-5" />
         </button>
       </div>
@@ -41,6 +42,7 @@ export default function ParticipantsPanel() {
               ...localParticipant,
               isMuted,
               isVideoOff,
+              isHandRaised,
             }}
             isLocal
             isHostView={isHost}
@@ -129,6 +131,11 @@ function ParticipantItem({
 
       {/* Status icons */}
       <div className="flex items-center gap-1">
+        {participant.isHandRaised && (
+          <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center animate-hand-pulse">
+            <Hand className="w-3 h-3 text-white" />
+          </div>
+        )}
         {participant.isMuted && (
           <div className="w-6 h-6 rounded-full bg-dark-600 flex items-center justify-center">
             <MicOff className="w-3 h-3 text-dark-300" />
@@ -147,6 +154,7 @@ function ParticipantItem({
           <button
             onClick={() => setShowMenu(!showMenu)}
             className="btn btn-ghost btn-icon opacity-0 group-hover:opacity-100"
+            title="More options"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
