@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { useWebRTC } from "@/hooks/useWebRTC";
 import { useMeetingStore } from "@/store/useMeetingStore";
+import { mediaManager } from "@/lib/webrtc/MediaManager";
 import VideoGrid from "@/components/meeting/VideoGrid";
 import ControlBar from "@/components/meeting/ControlBar";
 import ChatPanel from "@/components/meeting/ChatPanel";
@@ -19,6 +20,8 @@ export default function Meeting() {
 
   const { isChatOpen, isParticipantsOpen, isReconnecting, reset } =
     useMeetingStore();
+
+  const hasLeft = useRef(false);
 
   const {
     joinRoom,
@@ -52,14 +55,18 @@ export default function Meeting() {
       join();
     }
 
-    // Cleanup on unmount
+    // Cleanup on unmount - ensure camera/mic are released
     return () => {
-      reset();
+      if (!hasLeft.current) {
+        mediaManager.stopAll();
+        reset();
+      }
     };
   }, [roomCode, joinRoom, reset]);
 
   // Handle leaving
   const handleLeave = () => {
+    hasLeft.current = true;
     leaveRoom();
     navigate("/");
   };
@@ -91,7 +98,7 @@ export default function Meeting() {
   }
 
   return (
-    <div className="h-screen bg-dark-900 flex flex-col">
+    <div className="h-screen bg-dark-900 flex flex-col overflow-hidden">
       {/* Reconnection overlay */}
       {isReconnecting && (
         <div className="absolute inset-0 bg-black/70 z-50 flex flex-col items-center justify-center">
@@ -103,24 +110,34 @@ export default function Meeting() {
       )}
 
       {/* Main content area */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 flex overflow-hidden relative min-h-0">
         {/* Video area */}
-        <div className="flex-1 p-2 sm:p-4 overflow-hidden">
+        <div className="flex-1 p-1 sm:p-4 overflow-hidden">
           <VideoGrid />
         </div>
 
         {/* Side panels - full screen on mobile, sidebar on desktop */}
         {(isChatOpen || isParticipantsOpen) && (
-          <div className="absolute inset-0 md:relative md:inset-auto w-full md:w-80 border-l border-dark-800 flex flex-col bg-dark-900 z-40">
-            {isChatOpen && (
-              <ChatPanel
-                onSendMessage={sendMessage}
-                onTypingStart={sendTypingStart}
-                onTypingStop={sendTypingStop}
-              />
-            )}
-            {isParticipantsOpen && <ParticipantsPanel />}
-          </div>
+          <>
+            {/* Backdrop on mobile */}
+            <div
+              className="absolute inset-0 bg-black/50 z-30 md:hidden"
+              onClick={() => {
+                if (isChatOpen) useMeetingStore.getState().toggleChat();
+                if (isParticipantsOpen) useMeetingStore.getState().toggleParticipants();
+              }}
+            />
+            <div className="absolute inset-x-0 bottom-0 top-0 md:relative md:inset-auto w-full md:w-80 border-l border-dark-800 flex flex-col bg-dark-900 z-40 max-h-full">
+              {isChatOpen && (
+                <ChatPanel
+                  onSendMessage={sendMessage}
+                  onTypingStart={sendTypingStart}
+                  onTypingStop={sendTypingStop}
+                />
+              )}
+              {isParticipantsOpen && <ParticipantsPanel />}
+            </div>
+          </>
         )}
       </div>
 

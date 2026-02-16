@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { MicOff, Crown, Hand } from "lucide-react";
 import { Participant } from "@/store/useMeetingStore";
+import { useVoiceActivity } from "@/hooks/useVoiceActivity";
 
 interface VideoTileProps {
   participant: Participant;
@@ -21,6 +22,9 @@ export default function VideoTile({
 }: VideoTileProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // Detect if this participant is speaking
+  const isSpeaking = useVoiceActivity(stream, { enabled: !isMuted });
+
   useEffect(() => {
     if (videoRef.current && stream) {
       videoRef.current.srcObject = stream;
@@ -38,7 +42,7 @@ export default function VideoTile({
   };
 
   return (
-    <div className="video-container relative group">
+    <div className={`video-container relative group transition-all duration-200 ${isSpeaking ? 'ring-4 ring-green-500 ring-offset-2 ring-offset-dark-900' : ''}`}>
       {/* Video or Avatar */}
       {!isVideoOff && stream ? (
         <video
@@ -93,9 +97,14 @@ export default function VideoTile({
         </div>
       )}
 
-      {/* Speaking indicator (placeholder) */}
-      {!isMuted && (
-        <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-primary-500/30 transition-colors pointer-events-none" />
+      {/* Speaking indicator */}
+      {isSpeaking && (
+        <div className="absolute top-2 left-2">
+          <div className="flex items-center gap-1 px-2 py-1 bg-green-500 rounded-full">
+            <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+            <span className="text-xs text-white font-medium">Speaking</span>
+          </div>
+        </div>
       )}
     </div>
   );

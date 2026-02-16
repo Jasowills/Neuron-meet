@@ -67,6 +67,11 @@ export class RoomsController {
     return this.roomsService.getActiveParticipants(id);
   }
 
+  @Get('code/:code/participants')
+  async getParticipantsByCode(@Param('code') code: string) {
+    return this.roomsService.getActiveParticipantsByCode(code);
+  }
+
   @Get(':id/messages')
   async getMessages(@Param('id') id: string) {
     return this.roomsService.getRoomMessages(id);

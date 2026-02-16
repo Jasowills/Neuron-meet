@@ -46,7 +46,11 @@
   }
 
   .btn-icon {
-    @apply p-2;
+    @apply p-2 sm:p-2.5;
+  }
+
+  .btn-icon-sm {
+    @apply p-1.5;
   }
 
   .input {

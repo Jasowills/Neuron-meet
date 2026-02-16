@@ -5,6 +5,7 @@ import { socketClient } from "@/lib/socket/SocketClient";
 import { PeerConnectionManager } from "@/lib/webrtc/PeerConnection";
 import { mediaManager } from "@/lib/webrtc/MediaManager";
 import { toast } from "@/store/useToastStore";
+import { soundManager } from "@/lib/sounds/SoundManager";
 
 interface UseWebRTCOptions {
   roomCode: string;
@@ -74,6 +75,9 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
   // Join room
   const joinRoom = useCallback(async () => {
     try {
+      // Resume audio context for notification sounds (requires user interaction)
+      soundManager.resume();
+      
       // Get local media first
       const stream = await mediaManager.getLocalStream();
 
@@ -105,6 +109,10 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
 
       socket.on("room-joined", (data) => {
         clearTimeout(joinTimeout);
+        
+        // Clear any stale participants from previous sessions
+        useMeetingStore.getState().clearParticipants();
+        
         setRoomInfo(data.roomId, roomCode, data.isHost, data.settings);
         setMessages(data.messages || []);
         setConnected(true);
@@ -134,6 +142,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       socket.on("user-joined", (data) => {
         addParticipant(data.participant);
         toast.info(`${data.participant.displayName} joined the meeting`);
+        soundManager.play('join');
         // The new user will send us an offer
       });
 
@@ -144,6 +153,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
         if (participant) {
           toast.info(`${participant.displayName} left the meeting`);
         }
+        soundManager.play('leave');
         removeParticipant(data.socketId);
         pcManager.current?.closePeerConnection(data.socketId);
       });
@@ -227,6 +237,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       socket.on("user-hand-raised", (data) => {
         setParticipantHandRaise(data.socketId, true);
         toast.info(`${data.displayName} raised their hand`);
+        soundManager.play('handRaise');
       });
 
       socket.on("user-hand-lowered", (data) => {
@@ -236,6 +247,10 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       // Chat events
       socket.on("chat-message", (message) => {
         addMessage(message);
+        // Play sound only if chat is closed (user hasn't seen it)
+        if (!useMeetingStore.getState().isChatOpen) {
+          soundManager.play('message');
+        }
       });
 
       socket.on("user-typing", (data) => {
@@ -309,15 +324,35 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
 
   // Leave room
   const leaveRoom = useCallback(() => {
-    const { roomId } = useMeetingStore.getState();
+    const { roomId, localStream, screenStream } = useMeetingStore.getState();
+
+    // Play end meeting sound
+    soundManager.play('meetingEnd');
 
     if (roomId) {
       socketClient.emit("leave-room", { roomId });
     }
 
+    // Close all peer connections
     pcManager.current?.closeAll();
+    
+    // Stop all media tracks from store references
+    if (localStream) {
+      localStream.getTracks().forEach((track) => {
+        track.stop();
+      });
+    }
+    if (screenStream) {
+      screenStream.getTracks().forEach((track) => track.stop());
+    }
+    
+    // Stop MediaManager's streams
     mediaManager.stopAll();
+    
+    // Disconnect socket
     socketClient.disconnect();
+    
+    // Reset store state (also stops any remaining tracks)
     reset();
   }, [reset]);
 
@@ -330,9 +365,13 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
     } = useMeetingStore.getState();
     const newMuted = !isMuted;
 
+    // Toggle audio tracks - pass false to disable audio when muting
     mediaManager.toggleAudio(!newMuted);
+    
+    // Update store state
     storeToggleMute();
 
+    // Emit to server
     if (roomId) {
       socketClient.emit("toggle-audio", {
         roomId,

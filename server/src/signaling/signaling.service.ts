@@ -61,6 +61,25 @@ export class SignalingService {
 
     const isHost = room.hostId === userId;
 
+    // Clean up any existing socket for the same user in this room (prevents duplicates)
+    if (userId) {
+      const existingSocketIds = this.rooms.get(room.id);
+      if (existingSocketIds) {
+        const socketsToRemove: string[] = [];
+        for (const existingSocketId of existingSocketIds) {
+          const existingUser = this.users.get(existingSocketId);
+          if (existingUser && existingUser.userId === userId && existingSocketId !== socketId) {
+            socketsToRemove.push(existingSocketId);
+          }
+        }
+        // Remove old socket entries for this user
+        socketsToRemove.forEach(id => {
+          this.users.delete(id);
+          existingSocketIds.delete(id);
+        });
+      }
+    }
+
     // Store user data
     const userData: UserData = {
       socketId,

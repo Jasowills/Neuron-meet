@@ -222,11 +222,7 @@ src/
 | `TURN_USERNAME` | TURN credentials | Production |
 | `TURN_PASSWORD` | TURN credentials | Production |
 
-### Production TURN Server
 
-For production, you need a TURN server for NAT traversal. Options:
-- Self-hosted: [Coturn](https://github.com/coturn/coturn)
-- Managed: [Twilio TURN](https://www.twilio.com/stun-turn), [Xirsys](https://xirsys.com/)
 
 ## Contributing
 
@@ -242,4 +238,3 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-Built with ❤️ using WebRTC

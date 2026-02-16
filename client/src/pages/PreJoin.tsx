@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Video, VideoOff, Mic, MicOff, Settings, Loader2 } from "lucide-react";
+import { Video, VideoOff, Mic, MicOff, Settings, Loader2, Users } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import {
   mediaManager,
@@ -9,12 +9,21 @@ import {
 } from "@/lib/webrtc/MediaManager";
 import { api } from "@/lib/api/client";
 
+interface RoomParticipant {
+  id: string;
+  displayName: string;
+  avatarUrl: string | null;
+  isHost: boolean;
+}
+
 export default function PreJoin() {
   const { roomCode } = useParams<{ roomCode: string }>();
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const isJoiningRef = useRef(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isAudioOn, setIsAudioOn] = useState(true);
@@ -23,6 +32,8 @@ export default function PreJoin() {
   const [isLoading, setIsLoading] = useState(true);
   const [roomInfo, setRoomInfo] = useState<any>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [participants, setParticipants] = useState<RoomParticipant[]>([]);
+
   const [devices, setDevices] = useState<MediaDevice[]>([]);
   const [selectedCamera, setSelectedCamera] = useState("");
   const [selectedMic, setSelectedMic] = useState("");
@@ -34,6 +45,14 @@ export default function PreJoin() {
         const response = await api.get(`/rooms/code/${roomCode}`);
         setRoomInfo(response.data);
         setIsLoading(false);
+        
+        // Fetch active participants
+        try {
+          const participantsRes = await api.get(`/rooms/code/${roomCode}/participants`);
+          setParticipants(participantsRes.data);
+        } catch {
+          // Ignore participant fetch errors
+        }
       } catch (err: any) {
         setError(err.response?.data?.message || "Room not found");
         setIsLoading(false);
@@ -49,10 +68,8 @@ export default function PreJoin() {
   useEffect(() => {
     const initMedia = async () => {
       try {
-        console.log("Initializing media...");
         const mediaStream = await mediaManager.getLocalStream();
-        console.log("Got media stream:", mediaStream);
-        console.log("Video tracks:", mediaStream.getVideoTracks());
+        streamRef.current = mediaStream;
         setStream(mediaStream);
 
         // Get devices
@@ -66,27 +83,38 @@ export default function PreJoin() {
 
     initMedia();
 
+    // Cleanup: only stop streams if NOT joining the meeting
     return () => {
-      mediaManager.stopAll();
+      if (!isJoiningRef.current) {
+        // User canceled or navigated away - stop the camera
+        mediaManager.stopAll();
+      }
+      // If joining, the Meeting page will take over stream management
     };
   }, []);
 
-  // Update video element when stream changes
+  // Attach stream to video element - only when stream changes
   useEffect(() => {
-    if (videoRef.current && stream) {
-      console.log("Attaching stream to video element");
-      videoRef.current.srcObject = stream;
+    const video = videoRef.current;
+    const currentStream = streamRef.current;
+    
+    if (video && currentStream) {
+      // Only set srcObject if it's different to avoid reload
+      if (video.srcObject !== currentStream) {
+        video.srcObject = currentStream;
+        video.play().catch(() => {
+          // Autoplay may be blocked, that's ok
+        });
+      }
+    }
+  }, [stream]);
 
-      // Force play after a small delay to ensure element is ready
-      const playVideo = async () => {
-        try {
-          await videoRef.current?.play();
-          console.log("Video playing successfully");
-        } catch (err) {
-          console.error("Error playing video:", err);
-        }
-      };
-      playVideo();
+  // Callback ref to attach stream when video element mounts
+  const handleVideoRef = useCallback((node: HTMLVideoElement | null) => {
+    videoRef.current = node;
+    if (node && streamRef.current) {
+      node.srcObject = streamRef.current;
+      node.play().catch(() => {});
     }
   }, [stream]);
 
@@ -105,6 +133,9 @@ export default function PreJoin() {
       setError("Please enter your name");
       return;
     }
+
+    // Mark that we're joining - don't stop the stream on cleanup
+    isJoiningRef.current = true;
 
     // Store initial state in URL or session
     const queryParams = new URLSearchParams({
@@ -178,12 +209,12 @@ export default function PreJoin() {
           <div className="card">
             <div className="video-container bg-dark-800 mb-4">
               <video
-                ref={videoRef}
+                ref={handleVideoRef}
                 autoPlay
                 playsInline
                 muted
-                className={`absolute inset-0 w-full h-full object-cover rounded-xl transform scale-x-[-1] ${
-                  isVideoOn ? "block" : "hidden"
+                className={`absolute inset-0 w-full h-full object-cover rounded-xl transform scale-x-[-1] transition-opacity duration-200 ${
+                  isVideoOn ? "opacity-100" : "opacity-0"
                 }`}
               />
               {!isVideoOn && (
@@ -258,6 +289,55 @@ export default function PreJoin() {
               <div className="mb-4 p-3 bg-dark-700 rounded-lg">
                 <p className="text-sm text-dark-400">Joining as</p>
                 <p className="text-white font-medium">{user.displayName}</p>
+              </div>
+            )}
+
+            {/* Participants already in the meeting */}
+            {participants.length > 0 && (
+              <div className="mb-4 p-3 bg-dark-700 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="w-4 h-4 text-dark-400" />
+                  <p className="text-sm text-dark-400">
+                    {participants.length} {participants.length === 1 ? 'person' : 'people'} in this meeting
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 flex-wrap">
+                  {participants.slice(0, 5).map((p, index) => (
+                    <div
+                      key={p.id}
+                      className="relative group"
+                      title={p.displayName}
+                    >
+                      {p.avatarUrl ? (
+                        <img
+                          src={p.avatarUrl}
+                          alt={p.displayName}
+                          className="w-8 h-8 rounded-full border-2 border-dark-600"
+                          style={{ marginLeft: index > 0 ? '-8px' : '0' }}
+                        />
+                      ) : (
+                        <div
+                          className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center border-2 border-dark-600 text-white text-xs font-medium"
+                          style={{ marginLeft: index > 0 ? '-8px' : '0' }}
+                        >
+                          {p.displayName.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  {participants.length > 5 && (
+                    <div
+                      className="w-8 h-8 rounded-full bg-dark-600 flex items-center justify-center border-2 border-dark-700 text-white text-xs font-medium"
+                      style={{ marginLeft: '-8px' }}
+                    >
+                      +{participants.length - 5}
+                    </div>
+                  )}
+                </div>
+                <div className="mt-2 text-xs text-dark-400">
+                  {participants.slice(0, 3).map(p => p.displayName).join(', ')}
+                  {participants.length > 3 && ` and ${participants.length - 3} more`}
+                </div>
               </div>
             )}
 

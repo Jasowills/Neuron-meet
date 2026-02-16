@@ -77,6 +77,7 @@ interface MeetingState {
 
   addParticipant: (participant: Participant) => void;
   removeParticipant: (socketId: string) => void;
+  clearParticipants: () => void;
   updateParticipant: (socketId: string, updates: Partial<Participant>) => void;
   setParticipantStream: (socketId: string, stream: MediaStream) => void;
 
@@ -154,6 +155,7 @@ export const useMeetingStore = create<MeetingState>((set, get) => ({
   addParticipant: (participant) => {
     const { participants } = get();
     const newParticipants = new Map(participants);
+    // Remove any existing participant with same socketId (shouldn't happen but safety)
     newParticipants.set(participant.socketId, participant);
     set({ participants: newParticipants });
   },
@@ -163,6 +165,10 @@ export const useMeetingStore = create<MeetingState>((set, get) => ({
     const newParticipants = new Map(participants);
     newParticipants.delete(socketId);
     set({ participants: newParticipants });
+  },
+
+  clearParticipants: () => {
+    set({ participants: new Map() });
   },
 
   updateParticipant: (socketId, updates) => {
@@ -186,30 +192,18 @@ export const useMeetingStore = create<MeetingState>((set, get) => ({
   },
 
   toggleMute: () => {
-    const { isMuted, localStream } = get();
+    const { isMuted } = get();
     const newMuted = !isMuted;
-
-    // Toggle audio track
-    if (localStream) {
-      localStream.getAudioTracks().forEach((track) => {
-        track.enabled = !newMuted;
-      });
-    }
-
+    // Note: Audio track toggling is handled by useWebRTC/MediaManager
+    // This just updates the state
     set({ isMuted: newMuted });
   },
 
   toggleVideo: () => {
-    const { isVideoOff, localStream } = get();
+    const { isVideoOff } = get();
     const newVideoOff = !isVideoOff;
-
-    // Toggle video track
-    if (localStream) {
-      localStream.getVideoTracks().forEach((track) => {
-        track.enabled = !newVideoOff;
-      });
-    }
-
+    // Note: Video track toggling is handled by useWebRTC/MediaManager
+    // This just updates the state
     set({ isVideoOff: newVideoOff });
   },
 

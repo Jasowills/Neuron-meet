@@ -137,9 +137,9 @@ export default function ControlBar({
   const participantCount = participants.size + 1;
 
   return (
-    <div className="h-16 sm:h-20 bg-dark-800 border-t border-dark-700 px-2 sm:px-4 flex items-center justify-between">
+    <div className="h-16 sm:h-20 bg-dark-800 border-t border-dark-700 px-3 sm:px-4 flex items-center justify-center sm:justify-between">
       {/* Left side - meeting info (hidden on mobile) */}
-      <div className="hidden sm:flex items-center gap-4">
+      <div className="hidden sm:flex items-center gap-4 flex-shrink-0">
         <div>
           <p className="text-white text-sm font-medium">Meeting Code</p>
           <button
@@ -158,7 +158,7 @@ export default function ControlBar({
       </div>
 
       {/* Center - main controls */}
-      <div className="flex items-center gap-2 sm:gap-3 flex-1 sm:flex-none justify-center">
+      <div className="flex items-center gap-3 sm:gap-3">
         {/* Mic toggle */}
         <button
           onClick={onToggleMute}
@@ -219,10 +219,43 @@ export default function ControlBar({
           <Hand className="w-5 h-5" />
         </button>
 
+        {/* Divider on mobile */}
+        <div className="w-px h-6 bg-dark-600 sm:hidden" />
+
+        {/* Chat - shown inline on mobile */}
+        <button
+          onClick={toggleChat}
+          className={`btn btn-icon relative sm:hidden ${
+            isChatOpen ? "bg-primary-600" : "btn-secondary"
+          }`}
+          title="Chat (C)"
+        >
+          <MessageSquare className="w-5 h-5" />
+          {unreadMessageCount > 0 && !isChatOpen && (
+            <span className="absolute -top-1 -right-1 min-w-[1rem] h-4 bg-red-500 rounded-full text-xs flex items-center justify-center px-1">
+              {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
+            </span>
+          )}
+        </button>
+
+        {/* Participants - shown inline on mobile */}
+        <button
+          onClick={toggleParticipants}
+          className={`btn btn-icon relative sm:hidden ${
+            isParticipantsOpen ? "bg-primary-600" : "btn-secondary"
+          }`}
+          title="Participants (P)"
+        >
+          <Users className="w-5 h-5" />
+          <span className="absolute -top-1 -right-1 min-w-[1rem] h-4 bg-dark-600 rounded-full text-xs flex items-center justify-center px-1">
+            {participantCount}
+          </span>
+        </button>
+
         {/* Leave button */}
         <button
           onClick={onLeave}
-          className="btn btn-icon bg-red-600 hover:bg-red-700 ml-2 sm:ml-4"
+          className="btn btn-icon bg-red-600 hover:bg-red-700"
           title="Leave meeting"
         >
           <PhoneOff className="w-5 h-5" />
@@ -230,7 +263,7 @@ export default function ControlBar({
       </div>
 
       {/* Right side - panels */}
-      <div className="flex items-center gap-2">
+      <div className="hidden sm:flex items-center gap-2">
         {/* Chat */}
         <button
           onClick={toggleChat}

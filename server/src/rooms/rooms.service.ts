@@ -210,6 +210,40 @@ export class RoomsService {
     });
   }
 
+  async getActiveParticipantsByCode(roomCode: string) {
+    const room = await this.prisma.room.findUnique({
+      where: { code: roomCode },
+    });
+
+    if (!room) {
+      return [];
+    }
+
+    const participants = await this.prisma.participant.findMany({
+      where: {
+        roomId: room.id,
+        leftAt: null,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            displayName: true,
+            avatarUrl: true,
+          },
+        },
+      },
+      orderBy: { joinedAt: 'asc' },
+    });
+
+    return participants.map(p => ({
+      id: p.id,
+      displayName: p.user?.displayName || p.guestName || 'Guest',
+      avatarUrl: p.user?.avatarUrl || null,
+      isHost: p.isHost,
+    }));
+  }
+
   async getRoomMessages(roomId: string, limit = 100) {
     return this.prisma.message.findMany({
       where: { roomId },

@@ -14,6 +14,16 @@ export class MediaManager {
   private screenStream: MediaStream | null = null;
 
   async getLocalStream(constraints?: MediaConstraints): Promise<MediaStream> {
+    // Reuse existing stream if it's still active
+    if (this.localStream && this.localStream.active) {
+      const videoTracks = this.localStream.getVideoTracks();
+      const audioTracks = this.localStream.getAudioTracks();
+      // Check if we have working tracks
+      if ((videoTracks.length > 0 || audioTracks.length > 0)) {
+        return this.localStream;
+      }
+    }
+
     const defaultConstraints: MediaConstraints = {
       video: {
         width: { ideal: 1280 },
