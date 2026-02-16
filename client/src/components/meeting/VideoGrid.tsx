@@ -26,7 +26,13 @@ export default function VideoGrid() {
   // All participants including local user
   const allParticipants = useMemo(() => {
     const local = localParticipant
-      ? [{ ...localParticipant, isLocal: true, stream: localStream ?? undefined }]
+      ? [
+          {
+            ...localParticipant,
+            isLocal: true,
+            stream: localStream ?? undefined,
+          },
+        ]
       : [];
     const remote = participantList.map((p) => ({ ...p, isLocal: false }));
     return [...local, ...remote];
@@ -134,8 +140,12 @@ export default function VideoGrid() {
                 stream={participant.stream}
                 isLocal={participant.isLocal}
                 isMuted={participant.isLocal ? isMuted : participant.isMuted}
-                isVideoOff={participant.isLocal ? isVideoOff : participant.isVideoOff}
-                isHandRaised={participant.isLocal ? isHandRaised : participant.isHandRaised}
+                isVideoOff={
+                  participant.isLocal ? isVideoOff : participant.isVideoOff
+                }
+                isHandRaised={
+                  participant.isLocal ? isHandRaised : participant.isHandRaised
+                }
               />
             </div>
           ))}
@@ -158,7 +168,9 @@ export default function VideoGrid() {
                   key={idx}
                   onClick={() => setCurrentPage(idx)}
                   className={`w-2 h-2 rounded-full transition-colors ${
-                    idx === currentPage ? "bg-primary-500" : "bg-dark-600 hover:bg-dark-500"
+                    idx === currentPage
+                      ? "bg-primary-500"
+                      : "bg-dark-600 hover:bg-dark-500"
                   }`}
                   aria-label={`Page ${idx + 1}`}
                 />

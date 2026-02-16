@@ -124,7 +124,8 @@ export default function Meeting() {
               className="absolute inset-0 bg-black/50 z-30 md:hidden"
               onClick={() => {
                 if (isChatOpen) useMeetingStore.getState().toggleChat();
-                if (isParticipantsOpen) useMeetingStore.getState().toggleParticipants();
+                if (isParticipantsOpen)
+                  useMeetingStore.getState().toggleParticipants();
               }}
             />
             <div className="absolute inset-x-0 bottom-0 top-0 md:relative md:inset-auto w-full md:w-80 border-l border-dark-800 flex flex-col bg-dark-900 z-40 max-h-full">

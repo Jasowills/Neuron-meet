@@ -3,7 +3,14 @@
  * Uses Web Audio API to generate subtle notification sounds
  */
 
-type SoundType = 'join' | 'leave' | 'handRaise' | 'message' | 'mute' | 'unmute' | 'meetingEnd';
+type SoundType =
+  | "join"
+  | "leave"
+  | "handRaise"
+  | "message"
+  | "mute"
+  | "unmute"
+  | "meetingEnd";
 
 class SoundManager {
   private audioContext: AudioContext | null = null;
@@ -12,7 +19,9 @@ class SoundManager {
 
   private getAudioContext(): AudioContext {
     if (!this.audioContext) {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      this.audioContext = new (
+        window.AudioContext || (window as any).webkitAudioContext
+      )();
     }
     return this.audioContext;
   }
@@ -37,30 +46,30 @@ class SoundManager {
 
     try {
       switch (type) {
-        case 'join':
+        case "join":
           this.playJoinSound();
           break;
-        case 'leave':
+        case "leave":
           this.playLeaveSound();
           break;
-        case 'handRaise':
+        case "handRaise":
           this.playHandRaiseSound();
           break;
-        case 'message':
+        case "message":
           this.playMessageSound();
           break;
-        case 'mute':
+        case "mute":
           this.playMuteSound();
           break;
-        case 'unmute':
+        case "unmute":
           this.playUnmuteSound();
           break;
-        case 'meetingEnd':
+        case "meetingEnd":
           this.playMeetingEndSound();
           break;
       }
     } catch (error) {
-      console.error('Error playing sound:', error);
+      console.error("Error playing sound:", error);
     }
   }
 
@@ -96,8 +105,8 @@ class SoundManager {
     const now = ctx.currentTime;
 
     // Bell-like sound
-    this.playTone(ctx, 880, now, 0.08, 0.25, 'triangle'); // A5
-    this.playTone(ctx, 1108.73, now + 0.05, 0.1, 0.2, 'triangle'); // C#6
+    this.playTone(ctx, 880, now, 0.08, 0.25, "triangle"); // A5
+    this.playTone(ctx, 1108.73, now + 0.05, 0.1, 0.2, "triangle"); // C#6
   }
 
   /**
@@ -108,7 +117,7 @@ class SoundManager {
     const now = ctx.currentTime;
 
     // Quick soft pop
-    this.playTone(ctx, 800, now, 0.05, 0.1, 'sine');
+    this.playTone(ctx, 800, now, 0.05, 0.1, "sine");
   }
 
   /**
@@ -118,7 +127,7 @@ class SoundManager {
     const ctx = this.getAudioContext();
     const now = ctx.currentTime;
 
-    this.playTone(ctx, 300, now, 0.08, 0.08, 'sine');
+    this.playTone(ctx, 300, now, 0.08, 0.08, "sine");
   }
 
   /**
@@ -128,7 +137,7 @@ class SoundManager {
     const ctx = this.getAudioContext();
     const now = ctx.currentTime;
 
-    this.playTone(ctx, 500, now, 0.08, 0.1, 'sine');
+    this.playTone(ctx, 500, now, 0.08, 0.1, "sine");
   }
 
   /**
@@ -153,7 +162,7 @@ class SoundManager {
     startTime: number,
     duration: number,
     volume: number = 0.2,
-    type: OscillatorType = 'sine'
+    type: OscillatorType = "sine",
   ): void {
     const oscillator = ctx.createOscillator();
     const gainNode = ctx.createGain();
@@ -178,7 +187,7 @@ class SoundManager {
    */
   async resume(): Promise<void> {
     const ctx = this.getAudioContext();
-    if (ctx.state === 'suspended') {
+    if (ctx.state === "suspended") {
       await ctx.resume();
     }
   }

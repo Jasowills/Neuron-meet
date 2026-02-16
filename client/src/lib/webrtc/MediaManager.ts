@@ -19,7 +19,7 @@ export class MediaManager {
       const videoTracks = this.localStream.getVideoTracks();
       const audioTracks = this.localStream.getAudioTracks();
       // Check if we have working tracks
-      if ((videoTracks.length > 0 || audioTracks.length > 0)) {
+      if (videoTracks.length > 0 || audioTracks.length > 0) {
         return this.localStream;
       }
     }

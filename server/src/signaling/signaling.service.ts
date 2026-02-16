@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
 
 export interface UserData {
   socketId: string;
@@ -31,7 +31,7 @@ export class SignalingService {
     socketId: string,
     roomCode: string,
     userId?: string,
-    displayName: string = 'Guest',
+    displayName: string = "Guest",
   ): Promise<RoomJoinResult> {
     // Verify room exists and is active
     const room = await this.prisma.room.findUnique({
@@ -42,21 +42,21 @@ export class SignalingService {
     });
 
     if (!room) {
-      throw new Error('Room not found');
+      throw new Error("Room not found");
     }
 
     if (!room.isActive) {
-      throw new Error('Room is no longer active');
+      throw new Error("Room is no longer active");
     }
 
     if (room.isLocked) {
-      throw new Error('Room is locked');
+      throw new Error("Room is locked");
     }
 
     // Check max participants
     const currentCount = this.rooms.get(room.id)?.size || 0;
     if (room.settings && currentCount >= room.settings.maxParticipants) {
-      throw new Error('Room is full');
+      throw new Error("Room is full");
     }
 
     const isHost = room.hostId === userId;
@@ -68,12 +68,16 @@ export class SignalingService {
         const socketsToRemove: string[] = [];
         for (const existingSocketId of existingSocketIds) {
           const existingUser = this.users.get(existingSocketId);
-          if (existingUser && existingUser.userId === userId && existingSocketId !== socketId) {
+          if (
+            existingUser &&
+            existingUser.userId === userId &&
+            existingSocketId !== socketId
+          ) {
             socketsToRemove.push(existingSocketId);
           }
         }
         // Remove old socket entries for this user
-        socketsToRemove.forEach(id => {
+        socketsToRemove.forEach((id) => {
           this.users.delete(id);
           existingSocketIds.delete(id);
         });
@@ -112,7 +116,7 @@ export class SignalingService {
     // Get recent messages
     const messages = await this.prisma.message.findMany({
       where: { roomId: room.id },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: "asc" },
       take: 50,
       include: {
         user: {
@@ -128,7 +132,7 @@ export class SignalingService {
     return {
       roomId: room.id,
       isHost,
-      messages: messages.map(m => ({
+      messages: messages.map((m) => ({
         id: m.id,
         senderId: m.userId,
         senderName: m.senderName,
@@ -136,11 +140,13 @@ export class SignalingService {
         type: m.type,
         timestamp: m.createdAt.toISOString(),
       })),
-      settings: room.settings ? {
-        allowScreenShare: room.settings.allowScreenShare,
-        allowChat: room.settings.allowChat,
-        waitingRoom: room.settings.waitingRoom,
-      } : null,
+      settings: room.settings
+        ? {
+            allowScreenShare: room.settings.allowScreenShare,
+            allowChat: room.settings.allowChat,
+            waitingRoom: room.settings.waitingRoom,
+          }
+        : null,
     };
   }
 
@@ -161,13 +167,15 @@ export class SignalingService {
     if (!socketIds) return [];
 
     return Array.from(socketIds)
-      .map(id => this.users.get(id))
+      .map((id) => this.users.get(id))
       .filter((u): u is UserData => u !== undefined);
   }
 
   updateUserMedia(
     socketId: string,
-    updates: Partial<Pick<UserData, 'isMuted' | 'isVideoOff' | 'isScreenSharing'>>,
+    updates: Partial<
+      Pick<UserData, "isMuted" | "isVideoOff" | "isScreenSharing">
+    >,
   ): void {
     const userData = this.users.get(socketId);
     if (userData) {

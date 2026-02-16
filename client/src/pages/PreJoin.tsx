@@ -1,6 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Video, VideoOff, Mic, MicOff, Settings, Loader2, Users } from "lucide-react";
+import {
+  Video,
+  VideoOff,
+  Mic,
+  MicOff,
+  Settings,
+  Loader2,
+  Users,
+} from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import {
   mediaManager,
@@ -45,10 +53,12 @@ export default function PreJoin() {
         const response = await api.get(`/rooms/code/${roomCode}`);
         setRoomInfo(response.data);
         setIsLoading(false);
-        
+
         // Fetch active participants
         try {
-          const participantsRes = await api.get(`/rooms/code/${roomCode}/participants`);
+          const participantsRes = await api.get(
+            `/rooms/code/${roomCode}/participants`,
+          );
           setParticipants(participantsRes.data);
         } catch {
           // Ignore participant fetch errors
@@ -97,7 +107,7 @@ export default function PreJoin() {
   useEffect(() => {
     const video = videoRef.current;
     const currentStream = streamRef.current;
-    
+
     if (video && currentStream) {
       // Only set srcObject if it's different to avoid reload
       if (video.srcObject !== currentStream) {
@@ -110,13 +120,16 @@ export default function PreJoin() {
   }, [stream]);
 
   // Callback ref to attach stream when video element mounts
-  const handleVideoRef = useCallback((node: HTMLVideoElement | null) => {
-    videoRef.current = node;
-    if (node && streamRef.current) {
-      node.srcObject = streamRef.current;
-      node.play().catch(() => {});
-    }
-  }, [stream]);
+  const handleVideoRef = useCallback(
+    (node: HTMLVideoElement | null) => {
+      videoRef.current = node;
+      if (node && streamRef.current) {
+        node.srcObject = streamRef.current;
+        node.play().catch(() => {});
+      }
+    },
+    [stream],
+  );
 
   const toggleVideo = () => {
     mediaManager.toggleVideo(!isVideoOn);
@@ -298,7 +311,9 @@ export default function PreJoin() {
                 <div className="flex items-center gap-2 mb-2">
                   <Users className="w-4 h-4 text-dark-400" />
                   <p className="text-sm text-dark-400">
-                    {participants.length} {participants.length === 1 ? 'person' : 'people'} in this meeting
+                    {participants.length}{" "}
+                    {participants.length === 1 ? "person" : "people"} in this
+                    meeting
                   </p>
                 </div>
                 <div className="flex items-center gap-1 flex-wrap">
@@ -313,12 +328,12 @@ export default function PreJoin() {
                           src={p.avatarUrl}
                           alt={p.displayName}
                           className="w-8 h-8 rounded-full border-2 border-dark-600"
-                          style={{ marginLeft: index > 0 ? '-8px' : '0' }}
+                          style={{ marginLeft: index > 0 ? "-8px" : "0" }}
                         />
                       ) : (
                         <div
                           className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center border-2 border-dark-600 text-white text-xs font-medium"
-                          style={{ marginLeft: index > 0 ? '-8px' : '0' }}
+                          style={{ marginLeft: index > 0 ? "-8px" : "0" }}
                         >
                           {p.displayName.charAt(0).toUpperCase()}
                         </div>
@@ -328,15 +343,19 @@ export default function PreJoin() {
                   {participants.length > 5 && (
                     <div
                       className="w-8 h-8 rounded-full bg-dark-600 flex items-center justify-center border-2 border-dark-700 text-white text-xs font-medium"
-                      style={{ marginLeft: '-8px' }}
+                      style={{ marginLeft: "-8px" }}
                     >
                       +{participants.length - 5}
                     </div>
                   )}
                 </div>
                 <div className="mt-2 text-xs text-dark-400">
-                  {participants.slice(0, 3).map(p => p.displayName).join(', ')}
-                  {participants.length > 3 && ` and ${participants.length - 3} more`}
+                  {participants
+                    .slice(0, 3)
+                    .map((p) => p.displayName)
+                    .join(", ")}
+                  {participants.length > 3 &&
+                    ` and ${participants.length - 3} more`}
                 </div>
               </div>
             )}

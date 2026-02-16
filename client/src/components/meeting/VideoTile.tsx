@@ -42,7 +42,9 @@ export default function VideoTile({
   };
 
   return (
-    <div className={`video-container relative group transition-all duration-200 ${isSpeaking ? 'ring-4 ring-green-500 ring-offset-2 ring-offset-dark-900' : ''}`}>
+    <div
+      className={`video-container relative group transition-all duration-200 ${isSpeaking ? "ring-4 ring-green-500 ring-offset-2 ring-offset-dark-900" : ""}`}
+    >
       {/* Video or Avatar */}
       {!isVideoOff && stream ? (
         <video

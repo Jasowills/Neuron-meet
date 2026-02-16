@@ -77,7 +77,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
     try {
       // Resume audio context for notification sounds (requires user interaction)
       soundManager.resume();
-      
+
       // Get local media first
       const stream = await mediaManager.getLocalStream();
 
@@ -109,10 +109,10 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
 
       socket.on("room-joined", (data) => {
         clearTimeout(joinTimeout);
-        
+
         // Clear any stale participants from previous sessions
         useMeetingStore.getState().clearParticipants();
-        
+
         setRoomInfo(data.roomId, roomCode, data.isHost, data.settings);
         setMessages(data.messages || []);
         setConnected(true);
@@ -142,7 +142,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       socket.on("user-joined", (data) => {
         addParticipant(data.participant);
         toast.info(`${data.participant.displayName} joined the meeting`);
-        soundManager.play('join');
+        soundManager.play("join");
         // The new user will send us an offer
       });
 
@@ -153,7 +153,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
         if (participant) {
           toast.info(`${participant.displayName} left the meeting`);
         }
-        soundManager.play('leave');
+        soundManager.play("leave");
         removeParticipant(data.socketId);
         pcManager.current?.closePeerConnection(data.socketId);
       });
@@ -237,7 +237,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       socket.on("user-hand-raised", (data) => {
         setParticipantHandRaise(data.socketId, true);
         toast.info(`${data.displayName} raised their hand`);
-        soundManager.play('handRaise');
+        soundManager.play("handRaise");
       });
 
       socket.on("user-hand-lowered", (data) => {
@@ -249,7 +249,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
         addMessage(message);
         // Play sound only if chat is closed (user hasn't seen it)
         if (!useMeetingStore.getState().isChatOpen) {
-          soundManager.play('message');
+          soundManager.play("message");
         }
       });
 
@@ -327,7 +327,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
     const { roomId, localStream, screenStream } = useMeetingStore.getState();
 
     // Play end meeting sound
-    soundManager.play('meetingEnd');
+    soundManager.play("meetingEnd");
 
     if (roomId) {
       socketClient.emit("leave-room", { roomId });
@@ -335,7 +335,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
 
     // Close all peer connections
     pcManager.current?.closeAll();
-    
+
     // Stop all media tracks from store references
     if (localStream) {
       localStream.getTracks().forEach((track) => {
@@ -345,13 +345,13 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
     if (screenStream) {
       screenStream.getTracks().forEach((track) => track.stop());
     }
-    
+
     // Stop MediaManager's streams
     mediaManager.stopAll();
-    
+
     // Disconnect socket
     socketClient.disconnect();
-    
+
     // Reset store state (also stops any remaining tracks)
     reset();
   }, [reset]);
@@ -367,7 +367,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
 
     // Toggle audio tracks - pass false to disable audio when muting
     mediaManager.toggleAudio(!newMuted);
-    
+
     // Update store state
     storeToggleMute();
 

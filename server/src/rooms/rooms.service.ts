@@ -3,9 +3,9 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateRoomDto, UpdateRoomSettingsDto } from './dto/rooms.dto';
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { CreateRoomDto, UpdateRoomSettingsDto } from "./dto/rooms.dto";
 
 @Injectable()
 export class RoomsService {
@@ -13,10 +13,10 @@ export class RoomsService {
 
   // Generate a unique 9-digit room code
   private generateRoomCode(): string {
-    const chars = 'abcdefghijklmnopqrstuvwxyz';
-    let code = '';
+    const chars = "abcdefghijklmnopqrstuvwxyz";
+    let code = "";
     for (let i = 0; i < 3; i++) {
-      if (i > 0) code += '-';
+      if (i > 0) code += "-";
       for (let j = 0; j < 3; j++) {
         code += chars[Math.floor(Math.random() * chars.length)];
       }
@@ -37,13 +37,13 @@ export class RoomsService {
     } while (attempts < 10);
 
     if (attempts >= 10) {
-      throw new BadRequestException('Failed to generate unique room code');
+      throw new BadRequestException("Failed to generate unique room code");
     }
 
     const room = await this.prisma.room.create({
       data: {
         code,
-        name: dto.name || 'Meeting Room',
+        name: dto.name || "Meeting Room",
         hostId,
         settings: {
           create: {
@@ -83,7 +83,7 @@ export class RoomsService {
     });
 
     if (!room) {
-      throw new NotFoundException('Room not found');
+      throw new NotFoundException("Room not found");
     }
 
     return room;
@@ -105,17 +105,21 @@ export class RoomsService {
     });
 
     if (!room) {
-      throw new NotFoundException('Room not found');
+      throw new NotFoundException("Room not found");
     }
 
     return room;
   }
 
-  async updateSettings(roomId: string, userId: string, dto: UpdateRoomSettingsDto) {
+  async updateSettings(
+    roomId: string,
+    userId: string,
+    dto: UpdateRoomSettingsDto,
+  ) {
     const room = await this.findById(roomId);
 
     if (room.hostId !== userId) {
-      throw new ForbiddenException('Only the host can update room settings');
+      throw new ForbiddenException("Only the host can update room settings");
     }
 
     const { isLocked, ...settingsData } = dto;
@@ -143,7 +147,7 @@ export class RoomsService {
     const room = await this.findById(roomId);
 
     if (room.hostId !== userId) {
-      throw new ForbiddenException('Only the host can end the room');
+      throw new ForbiddenException("Only the host can end the room");
     }
 
     return this.prisma.room.update({
@@ -159,11 +163,11 @@ export class RoomsService {
     const room = await this.findById(roomId);
 
     if (!room.isActive) {
-      throw new BadRequestException('Room is no longer active');
+      throw new BadRequestException("Room is no longer active");
     }
 
     if (room.isLocked) {
-      throw new ForbiddenException('Room is locked');
+      throw new ForbiddenException("Room is locked");
     }
 
     // Check max participants
@@ -172,7 +176,7 @@ export class RoomsService {
     });
 
     if (room.settings && participantCount >= room.settings.maxParticipants) {
-      throw new BadRequestException('Room is full');
+      throw new BadRequestException("Room is full");
     }
 
     return this.prisma.participant.create({
@@ -233,12 +237,12 @@ export class RoomsService {
           },
         },
       },
-      orderBy: { joinedAt: 'asc' },
+      orderBy: { joinedAt: "asc" },
     });
 
-    return participants.map(p => ({
+    return participants.map((p) => ({
       id: p.id,
-      displayName: p.user?.displayName || p.guestName || 'Guest',
+      displayName: p.user?.displayName || p.guestName || "Guest",
       avatarUrl: p.user?.avatarUrl || null,
       isHost: p.isHost,
     }));
@@ -247,7 +251,7 @@ export class RoomsService {
   async getRoomMessages(roomId: string, limit = 100) {
     return this.prisma.message.findMany({
       where: { roomId },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: "asc" },
       take: limit,
       include: {
         user: {

@@ -15,7 +15,7 @@ interface UseVoiceActivityOptions {
  */
 export function useVoiceActivity(
   stream: MediaStream | null | undefined,
-  options: UseVoiceActivityOptions = {}
+  options: UseVoiceActivityOptions = {},
 ): boolean {
   const { enabled = true, threshold = VOICE_THRESHOLD } = options;
 
@@ -66,8 +66,11 @@ export function useVoiceActivity(
 
     // Create audio context and analyser
     try {
-      const audioContext = new (window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      const audioContext = new (
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext
+      )();
       const analyser = audioContext.createAnalyser();
       analyser.fftSize = 256;
       analyser.smoothingTimeConstant = SMOOTHING_FACTOR;
@@ -103,9 +106,12 @@ export function useVoiceActivity(
             clearTimeout(debounceTimeoutRef.current);
           }
 
-          debounceTimeoutRef.current = setTimeout(() => {
-            setIsSpeaking(currentlySpeaking);
-          }, currentlySpeaking ? 0 : DEBOUNCE_MS);
+          debounceTimeoutRef.current = setTimeout(
+            () => {
+              setIsSpeaking(currentlySpeaking);
+            },
+            currentlySpeaking ? 0 : DEBOUNCE_MS,
+          );
         }
 
         animationFrameRef.current = requestAnimationFrame(checkAudioLevel);
