@@ -1,0 +1,15 @@
+# Neuron Meet - robots.txt
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://neuronmeet.com/sitemap.xml
+
+# Disallow private/meeting URLs from indexing
+Disallow: /meeting/*
+Disallow: /join/*
+
+# Allow crawling of main pages
+Allow: /
+Allow: /login
+Allow: /register

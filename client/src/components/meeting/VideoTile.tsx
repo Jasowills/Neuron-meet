@@ -29,7 +29,7 @@ export default function VideoTile({
     if (videoRef.current && stream) {
       videoRef.current.srcObject = stream;
     }
-  }, [stream]);
+  }, [stream, isVideoOff]);
 
   // Get initials for avatar
   const getInitials = (name: string) => {

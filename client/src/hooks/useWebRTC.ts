@@ -445,7 +445,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
   }, []);
 
   // Toggle video
-  const toggleVideo = useCallback(() => {
+  const toggleVideo = useCallback(async () => {
     const {
       isVideoOff,
       roomId,
@@ -453,7 +453,16 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
     } = useMeetingStore.getState();
     const newVideoOff = !isVideoOff;
 
-    mediaManager.toggleVideo(!newVideoOff);
+    if (newVideoOff) {
+      mediaManager.toggleVideo(false);
+    } else {
+      const recoveredVideoTrack = await mediaManager.ensureVideoTrack();
+      mediaManager.toggleVideo(true);
+      if (recoveredVideoTrack) {
+        await pcManager.current?.replaceVideoTrack(recoveredVideoTrack);
+      }
+    }
+
     storeToggleVideo();
 
     if (roomId) {

@@ -131,6 +131,40 @@ export class MediaManager {
     }
   }
 
+  async ensureVideoTrack(): Promise<MediaStreamTrack | null> {
+    if (!this.localStream) return null;
+
+    const existingTrack = this.localStream
+      .getVideoTracks()
+      .find((track) => track.readyState === "live");
+    if (existingTrack) {
+      existingTrack.enabled = true;
+      return existingTrack;
+    }
+
+    const newStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        facingMode: "user",
+      },
+      audio: false,
+    });
+
+    const newTrack = newStream.getVideoTracks()[0];
+    if (!newTrack) return null;
+
+    // Remove ended tracks before adding the replacement.
+    this.localStream.getVideoTracks().forEach((track) => {
+      if (track.readyState !== "live") {
+        this.localStream?.removeTrack(track);
+      }
+    });
+
+    this.localStream.addTrack(newTrack);
+    return newTrack;
+  }
+
   async switchCamera(deviceId: string): Promise<void> {
     if (!this.localStream) return;
 
