@@ -93,6 +93,7 @@ export default function VideoGrid() {
               <video
                 autoPlay
                 playsInline
+                muted
                 ref={(el) => {
                   if (el) el.srcObject = screenStream;
                 }}

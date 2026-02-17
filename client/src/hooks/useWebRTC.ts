@@ -12,8 +12,33 @@ interface UseWebRTCOptions {
   displayName: string;
 }
 
+const MEETING_SOCKET_EVENTS = [
+  "room-joined",
+  "user-joined",
+  "user-left",
+  "offer",
+  "answer",
+  "ice-candidate",
+  "user-toggle-audio",
+  "user-toggle-video",
+  "screen-share-started",
+  "screen-share-stopped",
+  "user-hand-raised",
+  "user-hand-lowered",
+  "chat-message",
+  "user-typing",
+  "force-mute",
+  "force-disconnect",
+  "join-error",
+] as const;
+
+const clearMeetingSocketListeners = (socket: { off: (event: string) => void }) => {
+  MEETING_SOCKET_EVENTS.forEach((event) => socket.off(event));
+};
+
 export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
   const pcManager = useRef<PeerConnectionManager | null>(null);
+  const reconnectJoinHandlerRef = useRef<(() => void) | null>(null);
   const { user } = useAuthStore();
 
   const {
@@ -74,6 +99,7 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
 
   // Join room
   const joinRoom = useCallback(async () => {
+    let joinTimeout: ReturnType<typeof setTimeout> | undefined;
     try {
       // Resume audio context for notification sounds (requires user interaction)
       soundManager.resume();
@@ -94,6 +120,10 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
 
       // Connect socket
       const socket = socketClient.connect(displayName);
+      clearMeetingSocketListeners(socket);
+      if (reconnectJoinHandlerRef.current) {
+        socket.off("connect", reconnectJoinHandlerRef.current);
+      }
 
       // Set up socket event handlers
       let joinResolve: () => void;
@@ -103,12 +133,15 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
         joinReject = reject;
       });
 
-      const joinTimeout = setTimeout(() => {
+      joinTimeout = setTimeout(() => {
         joinReject(new Error("Join room timeout - no response from server"));
       }, 15000);
 
       socket.on("room-joined", (data) => {
         clearTimeout(joinTimeout);
+
+        // Reset stale peer state before renegotiating.
+        pcManager.current?.closeAll();
 
         // Clear any stale participants from previous sessions
         useMeetingStore.getState().clearParticipants();
@@ -134,6 +167,16 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
           addParticipant(p);
           // Create offer to existing participants
           createOfferForPeer(p.socketId);
+        });
+
+        // Sync current local media state to room on every join/rejoin.
+        socketClient.emit("toggle-audio", {
+          roomId: data.roomId,
+          enabled: !useMeetingStore.getState().isMuted,
+        });
+        socketClient.emit("toggle-video", {
+          roomId: data.roomId,
+          enabled: !useMeetingStore.getState().isVideoOff,
         });
 
         joinResolve();
@@ -259,22 +302,31 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
 
       // Host controls
       socket.on("force-mute", () => {
-        useMeetingStore.getState().toggleMute();
-        // Ensure actually muted
-        if (!useMeetingStore.getState().isMuted) {
-          useMeetingStore.getState().toggleMute();
-        }
+        mediaManager.toggleAudio(false);
+        useMeetingStore.getState().setMuted(true);
       });
 
       socket.on("force-disconnect", (_data) => {
         leaveRoom();
       });
 
-      socket.on("error", (data) => {
+      socket.on("join-error", (data) => {
         console.error("Socket error:", data);
         clearTimeout(joinTimeout);
         joinReject(new Error(data.message || "Failed to join room"));
       });
+
+      reconnectJoinHandlerRef.current = () => {
+        const { isConnected } = useMeetingStore.getState();
+        if (!isConnected) return;
+
+        socketClient.emit("join-room", {
+          roomCode,
+          userId: user?.id,
+          displayName: user?.displayName || displayName,
+        });
+      };
+      socket.on("connect", reconnectJoinHandlerRef.current);
 
       // Wait for socket to connect before joining
       if (!socket.connected) {
@@ -302,6 +354,10 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
     } catch (error) {
       console.error("Error joining room:", error);
       throw error;
+    } finally {
+      if (joinTimeout) {
+        clearTimeout(joinTimeout);
+      }
     }
   }, [
     roomCode,
@@ -323,11 +379,13 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
   ]);
 
   // Leave room
-  const leaveRoom = useCallback(() => {
+  const leaveRoom = useCallback((options?: { silent?: boolean }) => {
     const { roomId, localStream, screenStream } = useMeetingStore.getState();
 
     // Play end meeting sound
-    soundManager.play("meetingEnd");
+    if (!options?.silent) {
+      soundManager.play("meetingEnd");
+    }
 
     if (roomId) {
       socketClient.emit("leave-room", { roomId });
@@ -350,6 +408,14 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
     mediaManager.stopAll();
 
     // Disconnect socket
+    const socket = socketClient.getSocket();
+    if (socket) {
+      clearMeetingSocketListeners(socket);
+      if (reconnectJoinHandlerRef.current) {
+        socket.off("connect", reconnectJoinHandlerRef.current);
+      }
+    }
+    reconnectJoinHandlerRef.current = null;
     socketClient.disconnect();
 
     // Reset store state (also stops any remaining tracks)

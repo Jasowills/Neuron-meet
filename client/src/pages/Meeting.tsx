@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { useWebRTC } from "@/hooks/useWebRTC";
 import { useMeetingStore } from "@/store/useMeetingStore";
-import { mediaManager } from "@/lib/webrtc/MediaManager";
 import VideoGrid from "@/components/meeting/VideoGrid";
 import ControlBar from "@/components/meeting/ControlBar";
 import ChatPanel from "@/components/meeting/ChatPanel";
@@ -18,8 +17,7 @@ export default function Meeting() {
   const [isJoining, setIsJoining] = useState(true);
   const [error, setError] = useState("");
 
-  const { isChatOpen, isParticipantsOpen, isReconnecting, reset } =
-    useMeetingStore();
+  const { isChatOpen, isParticipantsOpen, isReconnecting } = useMeetingStore();
 
   const hasLeft = useRef(false);
 
@@ -55,14 +53,13 @@ export default function Meeting() {
       join();
     }
 
-    // Cleanup on unmount - ensure camera/mic are released
+    // Cleanup on unmount - ensure socket and media are released
     return () => {
       if (!hasLeft.current) {
-        mediaManager.stopAll();
-        reset();
+        leaveRoom({ silent: true });
       }
     };
-  }, [roomCode, joinRoom, reset]);
+  }, [roomCode, joinRoom, leaveRoom]);
 
   // Handle leaving
   const handleLeave = () => {

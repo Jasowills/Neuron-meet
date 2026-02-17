@@ -68,6 +68,12 @@ export class SignalingGateway
     @MessageBody() data: JoinRoomPayload,
   ) {
     const { roomCode, userId, displayName } = data;
+    const existingUserData = this.signalingService.getUserData(client.id);
+    if (existingUserData) {
+      client.leave(existingUserData.roomId);
+      this.signalingService.removeUser(client.id);
+    }
+
     console.log("Join room request:", {
       roomCode,
       userId,
@@ -104,6 +110,7 @@ export class SignalingGateway
           isMuted: false,
           isVideoOff: false,
           isScreenSharing: false,
+          isHandRaised: false,
         },
       });
 
@@ -127,14 +134,16 @@ export class SignalingGateway
         settings: roomData.settings,
       };
     } catch (error) {
-      console.error("Join room error:", error.message);
-      client.emit("error", {
+      const message =
+        error instanceof Error ? error.message : "Failed to join room";
+      console.error("Join room error:", message);
+      client.emit("join-error", {
         code: "JOIN_FAILED",
-        message: error.message,
+        message,
       });
       return {
         success: false,
-        error: error.message,
+        error: message,
       };
     }
   }

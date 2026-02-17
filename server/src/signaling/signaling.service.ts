@@ -33,6 +33,9 @@ export class SignalingService {
     userId?: string,
     displayName: string = "Guest",
   ): Promise<RoomJoinResult> {
+    // Defensive cleanup in case same socket tries to rejoin a room.
+    this.removeUser(socketId);
+
     // Verify room exists and is active
     const room = await this.prisma.room.findUnique({
       where: { code: roomCode },
@@ -53,15 +56,12 @@ export class SignalingService {
       throw new Error("Room is locked");
     }
 
-    // Check max participants
-    const currentCount = this.rooms.get(room.id)?.size || 0;
-    if (room.settings && currentCount >= room.settings.maxParticipants) {
-      throw new Error("Room is full");
+    // Initialize room set if needed
+    if (!this.rooms.has(room.id)) {
+      this.rooms.set(room.id, new Set());
     }
 
-    const isHost = room.hostId === userId;
-
-    // Clean up any existing socket for the same user in this room (prevents duplicates)
+    // CRITICAL: Clean up any stale connections for this user
     if (userId) {
       const existingSocketIds = this.rooms.get(room.id);
       if (existingSocketIds) {
@@ -78,11 +78,35 @@ export class SignalingService {
         }
         // Remove old socket entries for this user
         socketsToRemove.forEach((id) => {
+          console.log(`Cleaning up stale socket ${id} for user ${userId}`);
           this.users.delete(id);
           existingSocketIds.delete(id);
         });
       }
     }
+
+    // Also clean up any orphaned sockets that point to this room but user no longer exists
+    const roomSockets = this.rooms.get(room.id);
+    if (roomSockets) {
+      const orphanedSockets: string[] = [];
+      for (const sid of roomSockets) {
+        if (!this.users.has(sid)) {
+          orphanedSockets.push(sid);
+        }
+      }
+      orphanedSockets.forEach((sid) => {
+        console.log(`Cleaning up orphaned socket ${sid}`);
+        roomSockets.delete(sid);
+      });
+    }
+
+    // Check max participants after cleanup
+    const currentCount = this.rooms.get(room.id)?.size || 0;
+    if (room.settings && currentCount >= room.settings.maxParticipants) {
+      throw new Error("Room is full");
+    }
+
+    const isHost = room.hostId === userId;
 
     // Store user data
     const userData: UserData = {
@@ -157,7 +181,11 @@ export class SignalingService {
   removeUser(socketId: string): void {
     const userData = this.users.get(socketId);
     if (userData) {
-      this.rooms.get(userData.roomId)?.delete(socketId);
+      const roomSockets = this.rooms.get(userData.roomId);
+      roomSockets?.delete(socketId);
+      if (roomSockets && roomSockets.size === 0) {
+        this.rooms.delete(userData.roomId);
+      }
       this.users.delete(socketId);
     }
   }

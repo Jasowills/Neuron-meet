@@ -83,6 +83,8 @@ interface MeetingState {
 
   toggleMute: () => void;
   toggleVideo: () => void;
+  setMuted: (muted: boolean) => void;
+  setVideoOff: (videoOff: boolean) => void;
   setScreenSharing: (sharing: boolean) => void;
 
   toggleChat: () => void;
@@ -205,6 +207,14 @@ export const useMeetingStore = create<MeetingState>((set, get) => ({
     // Note: Video track toggling is handled by useWebRTC/MediaManager
     // This just updates the state
     set({ isVideoOff: newVideoOff });
+  },
+
+  setMuted: (muted) => {
+    set({ isMuted: muted });
+  },
+
+  setVideoOff: (videoOff) => {
+    set({ isVideoOff: videoOff });
   },
 
   setScreenSharing: (sharing) => {

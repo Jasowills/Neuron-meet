@@ -69,7 +69,8 @@ export class MediaManager {
     try {
       this.screenStream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
-        audio: true,
+        // Capturing system/tab audio is a frequent source of echo loops in calls.
+        audio: false,
       });
 
       // Handle when user stops sharing via browser UI
