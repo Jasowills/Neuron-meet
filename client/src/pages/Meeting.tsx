@@ -20,6 +20,7 @@ export default function Meeting() {
   const { isChatOpen, isParticipantsOpen, isReconnecting } = useMeetingStore();
 
   const hasLeft = useRef(false);
+  const hasJoined = useRef(false);
 
   const {
     joinRoom,
@@ -37,11 +38,24 @@ export default function Meeting() {
     displayName,
   });
 
+  const joinRoomRef = useRef(joinRoom);
+  const leaveRoomRef = useRef(leaveRoom);
+
+  useEffect(() => {
+    joinRoomRef.current = joinRoom;
+    leaveRoomRef.current = leaveRoom;
+  }, [joinRoom, leaveRoom]);
+
   // Join room on mount
   useEffect(() => {
+    if (!roomCode || hasJoined.current) {
+      return;
+    }
+    hasJoined.current = true;
+
     const join = async () => {
       try {
-        await joinRoom();
+        await joinRoomRef.current();
         setIsJoining(false);
       } catch (err: any) {
         setError(err.message || "Failed to join meeting");
@@ -49,17 +63,16 @@ export default function Meeting() {
       }
     };
 
-    if (roomCode) {
-      join();
-    }
+    join();
 
     // Cleanup on unmount - ensure socket and media are released
     return () => {
       if (!hasLeft.current) {
-        leaveRoom({ silent: true });
+        leaveRoomRef.current({ silent: true });
       }
+      hasJoined.current = false;
     };
-  }, [roomCode, joinRoom, leaveRoom]);
+  }, [roomCode]);
 
   // Handle leaving
   const handleLeave = () => {

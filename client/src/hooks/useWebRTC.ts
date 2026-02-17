@@ -54,8 +54,6 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
     addMessage,
     setMessages,
     setTypingUser,
-    isMuted,
-    isVideoOff,
     reset,
   } = useMeetingStore();
 
@@ -111,11 +109,13 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       pcManager.current?.setLocalStream(stream);
 
       // Ensure video/audio tracks are enabled based on initial state
+      const { isMuted: currentMuted, isVideoOff: currentVideoOff } =
+        useMeetingStore.getState();
       stream.getAudioTracks().forEach((track) => {
-        track.enabled = !isMuted;
+        track.enabled = !currentMuted;
       });
       stream.getVideoTracks().forEach((track) => {
-        track.enabled = !isVideoOff;
+        track.enabled = !currentVideoOff;
       });
 
       // Connect socket
@@ -156,8 +156,8 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
           userId: user?.id,
           displayName: user?.displayName || displayName,
           isHost: data.isHost,
-          isMuted,
-          isVideoOff,
+          isMuted: currentMuted,
+          isVideoOff: currentVideoOff,
           isScreenSharing: false,
           isHandRaised: false,
         });
@@ -363,8 +363,6 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
     roomCode,
     displayName,
     user,
-    isMuted,
-    isVideoOff,
     setLocalStream,
     setRoomInfo,
     setConnected,
