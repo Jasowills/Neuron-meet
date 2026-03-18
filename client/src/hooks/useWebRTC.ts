@@ -111,6 +111,8 @@ export function useWebRTC({ roomCode, displayName }: UseWebRTCOptions) {
       // Ensure video/audio tracks are enabled based on initial state
       const { isMuted: currentMuted, isVideoOff: currentVideoOff } =
         useMeetingStore.getState();
+
+        
       stream.getAudioTracks().forEach((track) => {
         track.enabled = !currentMuted;
       });
