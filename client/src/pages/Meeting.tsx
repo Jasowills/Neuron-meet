@@ -94,7 +94,9 @@ export default function Meeting() {
       <div className="h-screen bg-dark-950 flex flex-col items-center justify-center">
         <Loader2 className="w-12 h-12 animate-spin text-primary-500 mb-4" />
         <p className="text-white text-lg font-medium">Joining room...</p>
-        <p className="mt-2 text-sm text-dark-300">Checking your connection and pulling the room state.</p>
+        <p className="mt-2 text-sm text-dark-300">
+          Checking your connection and pulling the room state.
+        </p>
       </div>
     );
   }
@@ -103,7 +105,9 @@ export default function Meeting() {
     return (
       <div className="h-screen bg-dark-900 flex flex-col items-center justify-center">
         <div className="card text-center max-w-md">
-          <h1 className="text-2xl font-bold text-white mb-4">Couldn't join the room</h1>
+          <h1 className="text-2xl font-bold text-white mb-4">
+            Couldn't join the room
+          </h1>
           <p className="text-dark-400 mb-6">{error}</p>
           <button
             onClick={() => navigate("/")}
@@ -122,7 +126,9 @@ export default function Meeting() {
       {isReconnecting && (
         <div className="absolute inset-0 bg-black/70 z-50 flex flex-col items-center justify-center">
           <WifiOff className="w-12 h-12 text-yellow-500 mb-4" />
-          <p className="text-white text-lg font-medium mb-2">Connection dropped</p>
+          <p className="text-white text-lg font-medium mb-2">
+            Connection dropped
+          </p>
           <p className="text-dark-300">Trying to reconnect you to the room.</p>
           <Loader2 className="w-6 h-6 animate-spin text-primary-500 mt-4" />
         </div>
@@ -132,7 +138,9 @@ export default function Meeting() {
         <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex min-w-0 items-center gap-4">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-dark-300">Neuronmeet room</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-dark-300">
+                Neuronmeet room
+              </p>
               <p className="mt-1 truncate text-base font-semibold text-dark-900 sm:text-lg">
                 Meeting room
               </p>
@@ -141,14 +149,17 @@ export default function Meeting() {
 
           <div className="flex flex-wrap items-center gap-2 text-sm text-dark-500">
             <span className="inline-flex items-center rounded-md border border-[rgba(23,32,51,0.1)] bg-white/78 px-3 py-1.5 text-xs font-medium text-dark-700 shadow-[0_8px_24px_rgba(23,32,51,0.05)]">
-              {participantCount} {participantCount === 1 ? "participant" : "participants"}
+              {participantCount}{" "}
+              {participantCount === 1 ? "participant" : "participants"}
             </span>
             {isScreenSharing && (
               <span className="inline-flex items-center rounded-md border border-primary-400/20 bg-primary-50 px-3 py-1.5 text-xs font-medium text-primary-700">
                 {displayName} is presenting
               </span>
             )}
-            <span className="text-xs text-dark-400">Signed in as {displayName}</span>
+            <span className="text-xs text-dark-400">
+              Signed in as {displayName}
+            </span>
           </div>
         </div>
       </div>

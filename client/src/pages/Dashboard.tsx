@@ -1,15 +1,22 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowRight, CalendarPlus, Loader2, LogOut, ShieldCheck, UsersRound } from 'lucide-react';
-import { useAuthStore } from '@/store/useAuthStore';
-import { api } from '@/lib/api/client';
-import BrandLogo from '@/components/ui/BrandLogo';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  CalendarPlus,
+  Loader2,
+  LogOut,
+  ShieldCheck,
+  UsersRound,
+} from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
+import { api } from "@/lib/api/client";
+import BrandLogo from "@/components/ui/BrandLogo";
 
 export default function Dashboard() {
-  const [roomCode, setRoomCode] = useState('');
+  const [roomCode, setRoomCode] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const [roomName, setRoomName] = useState('');
-  
+  const [roomName, setRoomName] = useState("");
+
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
 
@@ -24,13 +31,13 @@ export default function Dashboard() {
     e.preventDefault();
     setIsCreating(true);
     try {
-      const response = await api.post('/rooms', {
+      const response = await api.post("/rooms", {
         name: roomName.trim() || undefined,
       });
       const room = response.data;
       navigate(`/join/${room.code}`);
     } catch (error) {
-      console.error('Error creating room:', error);
+      console.error("Error creating room:", error);
     } finally {
       setIsCreating(false);
     }
@@ -38,7 +45,7 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -67,25 +74,37 @@ export default function Dashboard() {
         <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
           <div className="nm-panel px-6 py-8 sm:px-8 sm:py-9">
             <p className="nm-label">Operations</p>
-            <h1 className="nm-heading-lg text-[2.7rem]">Start a room or join one.</h1>
+            <h1 className="nm-heading-lg text-[2.7rem]">
+              Start a room or join one.
+            </h1>
             <p className="nm-note mt-4 max-w-2xl text-base sm:text-lg">
-              Create a room for a new call or enter a code for one that is already running. Both paths stay visible on the same screen.
+              Create a room for a new call or enter a code for one that is
+              already running. Both paths stay visible on the same screen.
             </p>
 
             <div className="mt-8 grid gap-4 lg:grid-cols-2">
-              <form onSubmit={handleCreateMeeting} className="rounded-[28px] border border-[#d7ddec] bg-white/78 p-5 shadow-[0_18px_40px_rgba(23,32,51,0.05)]">
+              <form
+                onSubmit={handleCreateMeeting}
+                className="rounded-[28px] border border-[#d7ddec] bg-white/78 p-5 shadow-[0_18px_40px_rgba(23,32,51,0.05)]"
+              >
                 <div className="flex items-center gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary-50 text-primary-700">
                     <CalendarPlus className="h-5 w-5" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-dark-900">Create a meeting</h2>
-                    <p className="text-sm text-dark-500">Give it a name or leave it unnamed.</p>
+                    <h2 className="text-lg font-bold text-dark-900">
+                      Create a meeting
+                    </h2>
+                    <p className="text-sm text-dark-500">
+                      Give it a name or leave it unnamed.
+                    </p>
                   </div>
                 </div>
 
                 <div className="mt-5">
-                  <label htmlFor="roomName" className="nm-label">Room name</label>
+                  <label htmlFor="roomName" className="nm-label">
+                    Room name
+                  </label>
                   <input
                     id="roomName"
                     type="text"
@@ -118,14 +137,20 @@ export default function Dashboard() {
                     <UsersRound className="h-5 w-5" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-dark-900">Join a live room</h2>
-                    <p className="text-sm text-dark-500">Enter the code someone shared with you.</p>
+                    <h2 className="text-lg font-bold text-dark-900">
+                      Join a live room
+                    </h2>
+                    <p className="text-sm text-dark-500">
+                      Enter the code someone shared with you.
+                    </p>
                   </div>
                 </div>
 
                 <form onSubmit={handleJoinMeeting} className="mt-5 space-y-4">
                   <div>
-                    <label htmlFor="joinCode" className="nm-label">Room code</label>
+                    <label htmlFor="joinCode" className="nm-label">
+                      Room code
+                    </label>
                     <input
                       id="joinCode"
                       type="text"
@@ -155,7 +180,8 @@ export default function Dashboard() {
               Keep the two key actions in view.
             </h2>
             <p className="mt-4 text-base leading-7 text-[#d3d9e6]">
-              You should not have to open a modal just to start a room or hunt through menus just to join one.
+              You should not have to open a modal just to start a room or hunt
+              through menus just to join one.
             </p>
 
             <div className="mt-8 space-y-3">
@@ -163,9 +189,12 @@ export default function Dashboard() {
                 <div className="flex items-start gap-3">
                   <ShieldCheck className="mt-1 h-5 w-5 text-[#c4a46a]" />
                   <div>
-                    <h3 className="text-base font-semibold text-white">Fewer steps to join</h3>
+                    <h3 className="text-base font-semibold text-white">
+                      Fewer steps to join
+                    </h3>
                     <p className="mt-2 text-sm leading-6 text-[#c8cfdd]">
-                      People move from code entry to device check without unnecessary branching.
+                      People move from code entry to device check without
+                      unnecessary branching.
                     </p>
                   </div>
                 </div>
@@ -174,9 +203,12 @@ export default function Dashboard() {
                 <div className="flex items-start gap-3">
                   <ArrowRight className="mt-1 h-5 w-5 text-[#c4a46a]" />
                   <div>
-                    <h3 className="text-base font-semibold text-white">No modal detour</h3>
+                    <h3 className="text-base font-semibold text-white">
+                      No modal detour
+                    </h3>
                     <p className="mt-2 text-sm leading-6 text-[#c8cfdd]">
-                      Room creation stays inline so hosts can act faster and keep context.
+                      Room creation stays inline so hosts can act faster and
+                      keep context.
                     </p>
                   </div>
                 </div>

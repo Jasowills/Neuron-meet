@@ -41,7 +41,10 @@ export default function Home() {
                 >
                   Sign in
                 </Link>
-                <Link to="/register" className="nm-btn nm-btn-primary px-5 py-2.5 text-sm">
+                <Link
+                  to="/register"
+                  className="nm-btn nm-btn-primary px-5 py-2.5 text-sm"
+                >
                   Get started
                 </Link>
               </>
@@ -62,8 +65,9 @@ export default function Home() {
                 Video calls that start without the scramble.
               </h1>
               <p className="nm-subtitle mt-6 max-w-2xl">
-                Join from a code, check your camera and mic, and get into the room
-                without hunting through settings or explaining the interface to other people.
+                Join from a code, check your camera and mic, and get into the
+                room without hunting through settings or explaining the
+                interface to other people.
               </p>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -73,11 +77,15 @@ export default function Home() {
                 </div>
                 <div className="nm-stat">
                   <strong>50 seats</strong>
-                  <span>Room size for team reviews, classes, and client sessions</span>
+                  <span>
+                    Room size for team reviews, classes, and client sessions
+                  </span>
                 </div>
                 <div className="nm-stat">
                   <strong>Zero install</strong>
-                  <span>Browser access for invited people and account holders</span>
+                  <span>
+                    Browser access for invited people and account holders
+                  </span>
                 </div>
               </div>
 
@@ -159,8 +167,14 @@ export default function Home() {
               </p>
               <div className="mt-4 space-y-3 text-sm text-[#d9dfeb]">
                 <p>Purpose-built pre-join checks reduce awkward call starts.</p>
-                <p>Hosts can share, manage people, and move through the room without guesswork.</p>
-                <p>Guests can join quickly without creating friction for the rest of the call.</p>
+                <p>
+                  Hosts can share, manage people, and move through the room
+                  without guesswork.
+                </p>
+                <p>
+                  Guests can join quickly without creating friction for the rest
+                  of the call.
+                </p>
               </div>
             </div>
           </aside>
@@ -173,21 +187,28 @@ export default function Home() {
               Clear meeting flow, not extra ceremony.
             </h3>
             <p className="nm-note mt-3 max-w-2xl">
-              The product is built around three jobs: get in fast, check your setup, and stay in control once the call starts.
+              The product is built around three jobs: get in fast, check your
+              setup, and stay in control once the call starts.
             </p>
           </div>
           <div className="nm-panel px-6 py-6">
             <ShieldCheck className="h-6 w-6 text-primary-700" />
-            <h3 className="mt-5 text-lg font-bold text-dark-900">Room controls</h3>
+            <h3 className="mt-5 text-lg font-bold text-dark-900">
+              Room controls
+            </h3>
             <p className="nm-note mt-2">
-              Waiting rooms, guest access, and clear host roles for meetings with people outside your team.
+              Waiting rooms, guest access, and clear host roles for meetings
+              with people outside your team.
             </p>
           </div>
           <div className="nm-panel px-6 py-6">
             <Waypoints className="h-6 w-6 text-primary-700" />
-            <h3 className="mt-5 text-lg font-bold text-dark-900">In-call tools</h3>
+            <h3 className="mt-5 text-lg font-bold text-dark-900">
+              In-call tools
+            </h3>
             <p className="nm-note mt-2">
-              Screen sharing, chat, and participant tools that stay available without taking over the room.
+              Screen sharing, chat, and participant tools that stay available
+              without taking over the room.
             </p>
           </div>
         </section>

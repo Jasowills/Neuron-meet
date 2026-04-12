@@ -220,10 +220,12 @@ export default function PreJoin() {
           <div className="flex flex-wrap items-center gap-3 text-sm text-dark-600">
             <span className="nm-chip">
               <ShieldCheck className="h-4 w-4 text-primary-700" />
-              {participants.length} active {participants.length === 1 ? "participant" : "participants"}
+              {participants.length} active{" "}
+              {participants.length === 1 ? "participant" : "participants"}
             </span>
             <span className="nm-chip">
-              Room code <strong className="font-mono text-dark-900">{roomCode}</strong>
+              Room code{" "}
+              <strong className="font-mono text-dark-900">{roomCode}</strong>
             </span>
           </div>
         </header>
@@ -243,7 +245,8 @@ export default function PreJoin() {
                 </p>
               </div>
               <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-[#dce2ed]">
-                {isVideoOn ? "Camera ready" : "Camera off"} · {isAudioOn ? "Mic live" : "Mic muted"}
+                {isVideoOn ? "Camera ready" : "Camera off"} ·{" "}
+                {isAudioOn ? "Mic live" : "Mic muted"}
               </div>
             </div>
 
@@ -309,7 +312,9 @@ export default function PreJoin() {
           <section className="nm-panel flex flex-col px-6 py-6 sm:px-7 sm:py-7">
             <div>
               <p className="nm-label">Join details</p>
-              <h2 className="nm-heading-lg text-[2.2rem]">Join without a last-minute scramble.</h2>
+              <h2 className="nm-heading-lg text-[2.2rem]">
+                Join without a last-minute scramble.
+              </h2>
               <p className="nm-note mt-3">
                 Confirm your name, your devices, and the room before you join.
               </p>
@@ -333,8 +338,12 @@ export default function PreJoin() {
 
             {user && (
               <div className="mt-6 rounded-[24px] border border-[#d7ddec] bg-white/80 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-dark-500">Joining as</p>
-                <p className="mt-2 text-lg font-semibold text-dark-900">{user.displayName}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-dark-500">
+                  Joining as
+                </p>
+                <p className="mt-2 text-lg font-semibold text-dark-900">
+                  {user.displayName}
+                </p>
               </div>
             )}
 
@@ -344,7 +353,8 @@ export default function PreJoin() {
                   <Users className="h-4 w-4 text-primary-700" />
                   <p className="text-sm font-medium text-dark-700">
                     {participants.length}{" "}
-                    {participants.length === 1 ? "person" : "people"} already in the room
+                    {participants.length === 1 ? "person" : "people"} already in
+                    the room
                   </p>
                 </div>
                 <div className="flex items-center gap-1 flex-wrap">
@@ -374,9 +384,7 @@ export default function PreJoin() {
                     </div>
                   ))}
                   {participants.length > 5 && (
-                    <div
-                      className="-ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-dark-200 text-xs font-medium text-dark-900"
-                    >
+                    <div className="-ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-dark-200 text-xs font-medium text-dark-900">
                       +{participants.length - 5}
                     </div>
                   )}

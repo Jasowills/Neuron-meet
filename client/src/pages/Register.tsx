@@ -1,29 +1,29 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, BadgeCheck, Loader2, ShieldCheck } from 'lucide-react';
-import { useAuthStore } from '@/store/useAuthStore';
-import BrandLogo from '@/components/ui/BrandLogo';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, BadgeCheck, Loader2, ShieldCheck } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
+import BrandLogo from "@/components/ui/BrandLogo";
 
 export default function Register() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { register } = useAuthStore();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
 
     try {
       await register(email, password, displayName);
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data?.message || "Registration failed");
     } finally {
       setIsLoading(false);
     }
@@ -46,7 +46,8 @@ export default function Register() {
               Create your meeting space.
             </h1>
             <p className="nm-note mt-5 text-base sm:text-lg">
-              Set up your account to host rooms, invite people, and keep repeat meetings in one place.
+              Set up your account to host rooms, invite people, and keep repeat
+              meetings in one place.
             </p>
           </div>
 
@@ -54,9 +55,12 @@ export default function Register() {
             <div className="flex items-start gap-3">
               <ShieldCheck className="mt-1 h-5 w-5 text-primary-700" />
               <div>
-                <h2 className="text-base font-semibold text-dark-900">Built for cleaner joins</h2>
+                <h2 className="text-base font-semibold text-dark-900">
+                  Built for cleaner joins
+                </h2>
                 <p className="mt-2 text-sm leading-6 text-dark-500">
-                  Guests can join quickly, hosts stay in control, and repeat calls stay easy to find.
+                  Guests can join quickly, hosts stay in control, and repeat
+                  calls stay easy to find.
                 </p>
               </div>
             </div>
@@ -69,7 +73,8 @@ export default function Register() {
             Start with a room that makes sense.
           </h2>
           <p className="mt-3 max-w-md text-base leading-7 text-[#d3d9e6]">
-            Add your details once, then start creating rooms and joining calls without repeating the same setup every time.
+            Add your details once, then start creating rooms and joining calls
+            without repeating the same setup every time.
           </p>
 
           {error && <div className="nm-alert mt-6">{error}</div>}
@@ -119,7 +124,9 @@ export default function Register() {
                 minLength={8}
                 required
               />
-              <p className="mt-2 text-sm text-[#aeb8cd]">Use at least 8 characters.</p>
+              <p className="mt-2 text-sm text-[#aeb8cd]">
+                Use at least 8 characters.
+              </p>
             </div>
 
             <button
@@ -139,8 +146,11 @@ export default function Register() {
           </form>
 
           <p className="mt-6 text-sm text-[#c5cfdf]">
-            Already have access?{' '}
-            <Link to="/login" className="font-semibold text-white underline decoration-white/30 underline-offset-4">
+            Already have access?{" "}
+            <Link
+              to="/login"
+              className="font-semibold text-white underline decoration-white/30 underline-offset-4"
+            >
               Sign in
             </Link>
           </p>
