@@ -43,7 +43,7 @@ export default function VideoTile({
 
   return (
     <div
-      className={`video-container relative group transition-all duration-200 ${isSpeaking ? "ring-4 ring-green-500 ring-offset-2 ring-offset-dark-900" : ""}`}
+      className={`video-container relative rounded-[14px] group transition-all duration-200 ${isSpeaking ? "ring-2 ring-primary-300 ring-offset-2 ring-offset-dark-950" : ""}`}
     >
       {/* Video or Avatar */}
       {!isVideoOff && stream ? (
@@ -76,12 +76,12 @@ export default function VideoTile({
           </div>
           <div className="flex items-center gap-1">
             {isHandRaised && (
-              <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center animate-hand-pulse">
+              <div className="w-6 h-6 rounded-md bg-yellow-500 flex items-center justify-center animate-hand-pulse">
                 <Hand className="w-3 h-3 text-white" />
               </div>
             )}
             {isMuted && (
-              <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center">
+              <div className="w-6 h-6 rounded-md bg-red-500 flex items-center justify-center">
                 <MicOff className="w-3 h-3 text-white" />
               </div>
             )}
@@ -92,7 +92,7 @@ export default function VideoTile({
       {/* Hand raised indicator at top */}
       {isHandRaised && (
         <div className="absolute top-2 right-2">
-          <div className="px-2 py-1 bg-yellow-500 rounded-full text-xs text-white font-medium flex items-center gap-1 animate-hand-pulse">
+          <div className="px-2 py-1 bg-yellow-500 rounded-md text-xs text-white font-medium flex items-center gap-1 animate-hand-pulse">
             <Hand className="w-3 h-3" />
             <span>Hand raised</span>
           </div>
@@ -102,7 +102,7 @@ export default function VideoTile({
       {/* Speaking indicator */}
       {isSpeaking && (
         <div className="absolute top-2 left-2">
-          <div className="flex items-center gap-1 px-2 py-1 bg-green-500 rounded-full">
+          <div className="flex items-center gap-1 rounded-md border border-primary-300/20 bg-primary-500/90 px-2 py-1 shadow-[0_10px_18px_rgba(63,99,216,0.2)]">
             <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
             <span className="text-xs text-white font-medium">Speaking</span>
           </div>

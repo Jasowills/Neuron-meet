@@ -23,6 +23,9 @@ export default function VideoGrid() {
     return Array.from(participants.values());
   }, [participants]);
 
+  const isPresentationMode =
+    isScreenSharing || participantList.some((participant) => participant.isScreenSharing);
+
   // All participants including local user
   const allParticipants = useMemo(() => {
     const local = localParticipant
@@ -38,9 +41,29 @@ export default function VideoGrid() {
     return [...local, ...remote];
   }, [localParticipant, localStream, participantList]);
 
+  const activePresenter = useMemo(() => {
+    if (isScreenSharing && localParticipant) {
+      return {
+        ...localParticipant,
+        isLocal: true,
+        stream: localStream ?? undefined,
+      };
+    }
+
+    const remotePresenter = participantList.find((participant) => participant.isScreenSharing);
+
+    if (!remotePresenter) {
+      return null;
+    }
+
+    return {
+      ...remotePresenter,
+      isLocal: false,
+    };
+  }, [isScreenSharing, localParticipant, localStream, participantList]);
+
   const totalParticipants = allParticipants.length;
   const totalPages = Math.ceil(totalParticipants / MAX_TILES_PER_PAGE);
-
   // Get participants for current page
   const visibleParticipants = useMemo(() => {
     const start = currentPage * MAX_TILES_PER_PAGE;
@@ -83,49 +106,84 @@ export default function VideoGrid() {
     setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1));
   };
 
-  return (
-    <div className="h-full flex flex-col">
-      {/* Screen share view */}
-      {(isScreenSharing || participantList.some((p) => p.isScreenSharing)) && (
-        <div className="mb-4 flex-shrink-0">
-          <div className="video-container max-h-[60vh]">
-            {isScreenSharing && screenStream ? (
-              <video
-                autoPlay
-                playsInline
-                muted
-                ref={(el) => {
-                  if (el) el.srcObject = screenStream;
-                }}
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              participantList
-                .filter((p) => p.isScreenSharing)
-                .map((p) => (
-                  <video
-                    key={`screen-${p.socketId}`}
-                    autoPlay
-                    playsInline
-                    ref={(el) => {
-                      if (el && p.stream) el.srcObject = p.stream;
-                    }}
-                    className="w-full h-full object-contain"
-                  />
-                ))
-            )}
-            <div className="absolute bottom-2 left-2 bg-black/50 px-2 py-1 rounded text-sm text-white">
-              {isScreenSharing ? "You are presenting" : "Screen share"}
+  if (isPresentationMode) {
+    return (
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-[1320px] flex-col gap-3 sm:gap-4">
+        <div className="relative min-h-0 flex-1 overflow-hidden rounded-[16px] border border-[rgba(23,32,51,0.12)] bg-[linear-gradient(180deg,_rgba(16,21,32,0.98)_0%,_rgba(24,31,45,0.98)_100%)] shadow-[0_28px_70px_rgba(23,32,51,0.16)]">
+          <div className="pointer-events-none absolute inset-0 rounded-[16px] border border-white/8" />
+          {isScreenSharing && screenStream ? (
+            <video
+              autoPlay
+              playsInline
+              muted
+              ref={(el) => {
+                if (el) el.srcObject = screenStream;
+              }}
+              className="absolute inset-0 h-full w-full object-contain"
+            />
+          ) : (
+            participantList
+              .filter((participant) => participant.isScreenSharing)
+              .map((participant) => (
+                <video
+                  key={`screen-${participant.socketId}`}
+                  autoPlay
+                  playsInline
+                  ref={(el) => {
+                    if (el && participant.stream) el.srcObject = participant.stream;
+                  }}
+                  className="absolute inset-0 h-full w-full object-contain"
+                />
+              ))
+          )}
+
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[rgba(7,12,20,0.84)] via-[rgba(7,12,20,0.28)] to-transparent px-4 py-4 sm:px-6">
+            <div>
+              <div>
+                <p className="text-sm font-medium text-white/85 sm:text-base">
+                  {isScreenSharing
+                    ? "You are presenting"
+                    : `${activePresenter?.displayName || "A participant"} is presenting`}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      )}
 
+        <div className="shrink-0 overflow-x-auto pb-1">
+          <div
+            className="mx-auto flex min-w-full max-w-[1320px] justify-start gap-3 rounded-[14px] border border-[rgba(23,32,51,0.12)] bg-[rgba(255,255,255,0.56)] px-3 py-3 shadow-[0_10px_26px_rgba(23,32,51,0.05)]"
+          >
+            {allParticipants.map((participant) => (
+              <div
+                key={participant.socketId}
+                className="w-[156px] shrink-0 sm:w-[188px]"
+              >
+                <div className="aspect-video">
+                  <VideoTile
+                    participant={participant}
+                    stream={participant.stream}
+                    isLocal={participant.isLocal}
+                    isMuted={participant.isLocal ? isMuted : participant.isMuted}
+                    isVideoOff={participant.isLocal ? isVideoOff : participant.isVideoOff}
+                    isHandRaised={participant.isLocal ? isHandRaised : participant.isHandRaised}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto flex h-full w-full max-w-[1320px] flex-col">
       {/* Video grid with pagination */}
       <div className="flex-1 flex flex-col min-h-0">
         {/* Grid container */}
         <div
-          className={`flex-1 grid ${gridLayout.className} gap-2 sm:gap-3 content-center items-center p-2 sm:p-4`}
+          className={`flex-1 grid ${gridLayout.className} content-center items-center gap-3 p-2 sm:gap-4 sm:p-4`}
         >
           {visibleParticipants.map((participant) => (
             <div

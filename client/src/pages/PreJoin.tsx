@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
+  ArrowRight,
   Video,
   VideoOff,
   Mic,
@@ -8,8 +9,10 @@ import {
   Settings,
   Loader2,
   Users,
+  ShieldCheck,
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
+import BrandLogo from "@/components/ui/BrandLogo";
 import {
   mediaManager,
   MediaManager,
@@ -181,20 +184,25 @@ export default function PreJoin() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      <div className="nm-page flex items-center justify-center">
+        <div className="nm-panel px-8 py-8 text-center">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary-600" />
+          <p className="mt-4 text-sm font-medium text-dark-700">
+            Preparing your meeting preview...
+          </p>
+        </div>
       </div>
     );
   }
 
   if (error && !roomInfo) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
-        <div className="card text-center max-w-md">
-          <h1 className="text-2xl font-bold text-white mb-4">Room not found</h1>
-          <p className="text-dark-400 mb-6">{error}</p>
-          <Link to="/" className="btn btn-primary btn-md">
-            Go Home
+      <div className="nm-page flex items-center justify-center px-4">
+        <div className="nm-panel max-w-md px-8 py-8 text-center">
+          <h1 className="nm-heading-lg text-[2.2rem]">Room not found</h1>
+          <p className="nm-note mt-3">{error}</p>
+          <Link to="/" className="nm-btn nm-btn-primary mt-6">
+            Return home
           </Link>
         </div>
       </div>
@@ -205,22 +213,41 @@ export default function PreJoin() {
   const microphones = devices.filter((d) => d.kind === "audioinput");
 
   return (
-    <div className="min-h-screen bg-dark-900 flex items-center justify-center p-4">
-      <div className="max-w-4xl w-full">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-white mb-2">
-            {roomInfo?.name || "Join Meeting"}
-          </h1>
-          <p className="text-dark-400">
-            Meeting code:{" "}
-            <span className="text-white font-mono">{roomCode}</span>
-          </p>
-        </div>
+    <div className="nm-page pb-10 pt-5 sm:pt-7">
+      <div className="nm-shell">
+        <header className="mb-6 flex flex-col gap-4 rounded-[32px] border border-white/60 bg-white/70 px-4 py-4 shadow-[0_20px_50px_rgba(23,32,51,0.06)] backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <BrandLogo caption="Pre-join check" />
+          <div className="flex flex-wrap items-center gap-3 text-sm text-dark-600">
+            <span className="nm-chip">
+              <ShieldCheck className="h-4 w-4 text-primary-700" />
+              {participants.length} active {participants.length === 1 ? "participant" : "participants"}
+            </span>
+            <span className="nm-chip">
+              Room code <strong className="font-mono text-dark-900">{roomCode}</strong>
+            </span>
+          </div>
+        </header>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Video Preview */}
-          <div className="card">
-            <div className="video-container bg-dark-800 mb-4">
+        <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+          <section className="nm-panel-dark px-5 py-5 sm:px-6 sm:py-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#bfc9da]">
+                  Preview
+                </p>
+                <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+                  {roomInfo?.name || "Join meeting"}
+                </h1>
+                <p className="mt-2 max-w-lg text-sm leading-6 text-[#c8cfdd] sm:text-base">
+                  Check how you look and sound before you enter the room.
+                </p>
+              </div>
+              <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-[#dce2ed]">
+                {isVideoOn ? "Camera ready" : "Camera off"} · {isAudioOn ? "Mic live" : "Mic muted"}
+              </div>
+            </div>
+
+            <div className="video-container mt-6 bg-dark-950/70">
               <video
                 ref={handleVideoRef}
                 autoPlay
@@ -232,19 +259,18 @@ export default function PreJoin() {
               />
               {!isVideoOn && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-20 h-20 rounded-full bg-dark-700 flex items-center justify-center">
+                  <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white/10">
                     <VideoOff className="w-8 h-8 text-dark-400" />
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Controls */}
-            <div className="flex justify-center gap-4">
+            <div className="mt-5 flex flex-wrap justify-center gap-3">
               <button
                 onClick={toggleAudio}
-                className={`btn btn-icon ${
-                  isAudioOn ? "btn-secondary" : "btn-danger"
+                className={`nm-btn ${
+                  isAudioOn ? "nm-btn-tertiary" : "bg-red-600 text-white"
                 }`}
                 title={isAudioOn ? "Mute" : "Unmute"}
               >
@@ -253,11 +279,12 @@ export default function PreJoin() {
                 ) : (
                   <MicOff className="w-5 h-5" />
                 )}
+                <span>{isAudioOn ? "Mute mic" : "Unmute mic"}</span>
               </button>
               <button
                 onClick={toggleVideo}
-                className={`btn btn-icon ${
-                  isVideoOn ? "btn-secondary" : "btn-danger"
+                className={`nm-btn ${
+                  isVideoOn ? "nm-btn-tertiary" : "bg-red-600 text-white"
                 }`}
                 title={isVideoOn ? "Turn off camera" : "Turn on camera"}
               >
@@ -266,54 +293,58 @@ export default function PreJoin() {
                 ) : (
                   <VideoOff className="w-5 h-5" />
                 )}
+                <span>{isVideoOn ? "Turn camera off" : "Turn camera on"}</span>
               </button>
               <button
                 onClick={() => setShowSettings(!showSettings)}
-                className="btn btn-secondary btn-icon"
+                className="nm-btn nm-btn-tertiary"
                 title="Settings"
               >
                 <Settings className="w-5 h-5" />
+                <span>{showSettings ? "Hide devices" : "Choose devices"}</span>
               </button>
             </div>
-          </div>
+          </section>
 
-          {/* Join Form */}
-          <div className="card flex flex-col">
+          <section className="nm-panel flex flex-col px-6 py-6 sm:px-7 sm:py-7">
+            <div>
+              <p className="nm-label">Join details</p>
+              <h2 className="nm-heading-lg text-[2.2rem]">Join without a last-minute scramble.</h2>
+              <p className="nm-note mt-3">
+                Confirm your name, your devices, and the room before you join.
+              </p>
+            </div>
+
             {!user && (
-              <div className="mb-4">
-                <label
-                  htmlFor="guestName"
-                  className="block text-sm font-medium text-dark-300 mb-1"
-                >
-                  Your Name
+              <div className="mt-6">
+                <label htmlFor="guestName" className="nm-label">
+                  Display name
                 </label>
                 <input
                   id="guestName"
                   type="text"
                   value={guestName}
                   onChange={(e) => setGuestName(e.target.value)}
-                  placeholder="Enter your name"
-                  className="input"
+                  placeholder="Name people will see in the room"
+                  className="nm-field"
                 />
               </div>
             )}
 
             {user && (
-              <div className="mb-4 p-3 bg-dark-700 rounded-lg">
-                <p className="text-sm text-dark-400">Joining as</p>
-                <p className="text-white font-medium">{user.displayName}</p>
+              <div className="mt-6 rounded-[24px] border border-[#d7ddec] bg-white/80 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-dark-500">Joining as</p>
+                <p className="mt-2 text-lg font-semibold text-dark-900">{user.displayName}</p>
               </div>
             )}
 
-            {/* Participants already in the meeting */}
             {participants.length > 0 && (
-              <div className="mb-4 p-3 bg-dark-700 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users className="w-4 h-4 text-dark-400" />
-                  <p className="text-sm text-dark-400">
+              <div className="mt-5 rounded-[24px] border border-[#d7ddec] bg-white/80 p-4">
+                <div className="mb-2 flex items-center gap-2">
+                  <Users className="h-4 w-4 text-primary-700" />
+                  <p className="text-sm font-medium text-dark-700">
                     {participants.length}{" "}
-                    {participants.length === 1 ? "person" : "people"} in this
-                    meeting
+                    {participants.length === 1 ? "person" : "people"} already in the room
                   </p>
                 </div>
                 <div className="flex items-center gap-1 flex-wrap">
@@ -327,13 +358,15 @@ export default function PreJoin() {
                         <img
                           src={p.avatarUrl}
                           alt={p.displayName}
-                          className="w-8 h-8 rounded-full border-2 border-dark-600"
-                          style={{ marginLeft: index > 0 ? "-8px" : "0" }}
+                          className={`h-8 w-8 rounded-full border-2 border-white ${
+                            index > 0 ? "-ml-2" : "ml-0"
+                          }`}
                         />
                       ) : (
                         <div
-                          className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center border-2 border-dark-600 text-white text-xs font-medium"
-                          style={{ marginLeft: index > 0 ? "-8px" : "0" }}
+                          className={`flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-primary-600 text-xs font-medium text-white ${
+                            index > 0 ? "-ml-2" : "ml-0"
+                          }`}
                         >
                           {p.displayName.charAt(0).toUpperCase()}
                         </div>
@@ -342,14 +375,13 @@ export default function PreJoin() {
                   ))}
                   {participants.length > 5 && (
                     <div
-                      className="w-8 h-8 rounded-full bg-dark-600 flex items-center justify-center border-2 border-dark-700 text-white text-xs font-medium"
-                      style={{ marginLeft: "-8px" }}
+                      className="-ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-dark-200 text-xs font-medium text-dark-900"
                     >
                       +{participants.length - 5}
                     </div>
                   )}
                 </div>
-                <div className="mt-2 text-xs text-dark-400">
+                <div className="mt-2 text-xs text-dark-500">
                   {participants
                     .slice(0, 3)
                     .map((p) => p.displayName)
@@ -360,21 +392,17 @@ export default function PreJoin() {
               </div>
             )}
 
-            {/* Device Settings */}
             {showSettings && (
-              <div className="mb-4 space-y-3">
+              <div className="mt-5 space-y-4 rounded-[24px] border border-[#d7ddec] bg-white/80 p-4">
                 <div>
-                  <label
-                    htmlFor="camera-select"
-                    className="block text-sm font-medium text-dark-300 mb-1"
-                  >
+                  <label htmlFor="camera-select" className="nm-label">
                     Camera
                   </label>
                   <select
                     id="camera-select"
                     value={selectedCamera}
                     onChange={(e) => handleCameraChange(e.target.value)}
-                    className="input"
+                    className="nm-field"
                     aria-label="Select camera"
                   >
                     {cameras.map((camera) => (
@@ -385,17 +413,14 @@ export default function PreJoin() {
                   </select>
                 </div>
                 <div>
-                  <label
-                    htmlFor="mic-select"
-                    className="block text-sm font-medium text-dark-300 mb-1"
-                  >
+                  <label htmlFor="mic-select" className="nm-label">
                     Microphone
                   </label>
                   <select
                     id="mic-select"
                     value={selectedMic}
                     onChange={(e) => handleMicChange(e.target.value)}
-                    className="input"
+                    className="nm-field"
                     aria-label="Select microphone"
                   >
                     {microphones.map((mic) => (
@@ -408,25 +433,25 @@ export default function PreJoin() {
               </div>
             )}
 
-            {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
-                {error}
-              </div>
-            )}
+            {error && <div className="nm-alert mt-5">{error}</div>}
 
-            <div className="mt-auto space-y-3">
+            <div className="mt-auto pt-6 space-y-3">
               <button
                 onClick={handleJoin}
                 disabled={!user && !guestName.trim()}
-                className="btn btn-primary btn-lg w-full"
+                className="nm-btn nm-btn-primary w-full"
               >
-                Join Meeting
+                Join room
+                <ArrowRight className="h-4 w-4" />
               </button>
-              <Link to="/" className="btn btn-ghost btn-md w-full text-center">
-                Cancel
+              <Link
+                to="/"
+                className="nm-btn nm-btn-secondary w-full text-center"
+              >
+                Back to home
               </Link>
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </div>

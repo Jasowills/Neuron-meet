@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Video, Loader2 } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Loader2, ShieldCheck } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
+import BrandLogo from '@/components/ui/BrandLogo';
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -29,44 +30,68 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-dark-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link to="/" className="flex justify-center items-center gap-2 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center">
-            <Video className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-xl font-bold text-white">Neuron Meet</span>
-        </Link>
+    <div className="nm-page flex items-center py-6 sm:py-10">
+      <div className="nm-shell grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-stretch">
+        <section className="nm-panel px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+          <Link to="/" className="inline-flex">
+            <BrandLogo />
+          </Link>
 
-        <div className="card">
-          <h2 className="text-2xl font-bold text-white text-center mb-6">
-            Create your account
-          </h2>
-
-          {error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
-              {error}
+          <div className="mt-10 max-w-xl">
+            <div className="nm-kicker">
+              <BadgeCheck className="h-4 w-4" />
+              Quick setup
             </div>
-          )}
+            <h1 className="mt-6 nm-heading-lg text-[2.8rem]">
+              Create your meeting space.
+            </h1>
+            <p className="nm-note mt-5 text-base sm:text-lg">
+              Set up your account to host rooms, invite people, and keep repeat meetings in one place.
+            </p>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="mt-10 rounded-[28px] border border-[#d7ddec] bg-white/80 p-5 shadow-[0_18px_40px_rgba(23,32,51,0.06)]">
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="mt-1 h-5 w-5 text-primary-700" />
+              <div>
+                <h2 className="text-base font-semibold text-dark-900">Built for cleaner joins</h2>
+                <p className="mt-2 text-sm leading-6 text-dark-500">
+                  Guests can join quickly, hosts stay in control, and repeat calls stay easy to find.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="nm-panel-dark px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+          <p className="nm-label text-[#d4dae7]">Create account</p>
+          <h2 className="font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+            Start with a room that makes sense.
+          </h2>
+          <p className="mt-3 max-w-md text-base leading-7 text-[#d3d9e6]">
+            Add your details once, then start creating rooms and joining calls without repeating the same setup every time.
+          </p>
+
+          {error && <div className="nm-alert mt-6">{error}</div>}
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             <div>
-              <label htmlFor="displayName" className="block text-sm font-medium text-dark-300 mb-1">
-                Display Name
+              <label htmlFor="displayName" className="nm-label text-[#d4dae7]">
+                Display name
               </label>
               <input
                 id="displayName"
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="input"
-                placeholder="John Doe"
+                className="nm-field-dark"
+                placeholder="Aisha Thompson"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-dark-300 mb-1">
+              <label htmlFor="email" className="nm-label text-[#d4dae7]">
                 Email
               </label>
               <input
@@ -74,14 +99,14 @@ export default function Register() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input"
+                className="nm-field-dark"
                 placeholder="you@example.com"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-dark-300 mb-1">
+              <label htmlFor="password" className="nm-label text-[#d4dae7]">
                 Password
               </label>
               <input
@@ -89,34 +114,37 @@ export default function Register() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input"
-                placeholder="••••••••"
+                className="nm-field-dark"
+                placeholder="Create a secure password"
                 minLength={8}
                 required
               />
-              <p className="mt-1 text-xs text-dark-500">Must be at least 8 characters</p>
+              <p className="mt-2 text-sm text-[#aeb8cd]">Use at least 8 characters.</p>
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="btn btn-primary btn-md w-full"
+              className="nm-btn nm-btn-primary w-full"
             >
               {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                'Create Account'
+                <>
+                  Create account
+                  <ArrowRight className="h-4 w-4" />
+                </>
               )}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-dark-400">
-            Already have an account?{' '}
-            <Link to="/login" className="text-primary-500 hover:text-primary-400">
+          <p className="mt-6 text-sm text-[#c5cfdf]">
+            Already have access?{' '}
+            <Link to="/login" className="font-semibold text-white underline decoration-white/30 underline-offset-4">
               Sign in
             </Link>
           </p>
-        </div>
+        </section>
       </div>
     </div>
   );

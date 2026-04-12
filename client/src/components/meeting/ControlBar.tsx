@@ -12,8 +12,52 @@ import {
   Copy,
   Check,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { useMeetingStore } from "@/store/useMeetingStore";
+
+interface ControlButtonProps {
+  icon: ReactNode;
+  label: string;
+  onClick: () => void;
+  title: string;
+  active?: boolean;
+  alert?: boolean;
+  badge?: ReactNode;
+  compact?: boolean;
+}
+
+function ControlButton({
+  icon,
+  label,
+  onClick,
+  title,
+  active = false,
+  alert = false,
+  badge,
+  compact = false,
+}: ControlButtonProps) {
+  const stateClass = alert
+    ? "border-red-500/20 bg-red-600 text-white hover:bg-red-500"
+    : active
+      ? "border-primary-400/40 bg-primary-600 text-white shadow-[0_12px_22px_rgba(49,83,189,0.28)] hover:bg-primary-500"
+      : "border-[rgba(23,32,51,0.12)] bg-white/82 text-dark-800 hover:bg-white";
+
+  const sizeClass = compact
+    ? "min-w-[3rem] px-3 py-2.5"
+    : "min-w-[5.25rem] px-3.5 py-3";
+
+  return (
+    <button
+      onClick={onClick}
+      className={`relative inline-flex items-center justify-center gap-2 rounded-lg border text-sm font-semibold transition ${sizeClass} ${stateClass}`}
+      title={title}
+    >
+      {icon}
+      <span className={compact ? "hidden lg:inline" : "hidden sm:inline"}>{label}</span>
+      {badge}
+    </button>
+  );
+}
 
 interface ControlBarProps {
   onToggleMute: () => void;
@@ -94,6 +138,16 @@ export default function ControlBar({
   ]);
 
   const [copied, setCopied] = useState(false);
+  const [confirmLeave, setConfirmLeave] = useState(false);
+
+  useEffect(() => {
+    if (!confirmLeave) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => setConfirmLeave(false), 2500);
+    return () => window.clearTimeout(timer);
+  }, [confirmLeave]);
 
   const handleCopyLink = async () => {
     if (!roomCode) {
@@ -134,165 +188,113 @@ export default function ControlBar({
     }
   };
 
+  const handleLeaveClick = () => {
+    if (!confirmLeave) {
+      setConfirmLeave(true);
+      return;
+    }
+
+    setConfirmLeave(false);
+    onLeave();
+  };
+
   const participantCount = participants.size + 1;
 
   return (
-    <div className="h-16 sm:h-20 bg-dark-800 border-t border-dark-700 px-3 sm:px-4 flex items-center justify-center sm:justify-between">
-      {/* Left side - meeting info (hidden on mobile) */}
-      <div className="hidden sm:flex items-center gap-4 flex-shrink-0">
-        <div>
-          <p className="text-white text-sm font-medium">Meeting Code</p>
+    <div className="border-t border-[rgba(23,32,51,0.08)] bg-white/70 px-3 py-3 backdrop-blur-xl sm:px-4">
+      <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-3 xl:grid xl:grid-cols-[auto_auto_auto] xl:items-center xl:justify-between xl:gap-4">
+        <div className="flex items-center justify-between gap-3 xl:justify-start">
           <button
             onClick={handleCopyLink}
-            className="flex items-center gap-2 text-dark-400 hover:text-white text-sm"
+            className="inline-flex items-center gap-2 rounded-md border border-[rgba(23,32,51,0.12)] bg-white/84 px-3.5 py-2.5 text-sm text-dark-700 transition hover:bg-white hover:text-dark-900"
             disabled={!roomCode}
           >
-            <span className="font-mono">{roomCode || "Loading..."}</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-dark-300">
+              Room
+            </span>
+            <span className="font-mono text-dark-900">{roomCode || "Loading..."}</span>
             {copied ? (
-              <Check className="w-4 h-4 text-green-500" />
+              <Check className="h-4 w-4 text-green-500" />
             ) : (
-              <Copy className="w-4 h-4" />
+              <Copy className="h-4 w-4" />
             )}
           </button>
         </div>
-      </div>
 
-      {/* Center - main controls */}
-      <div className="flex items-center gap-3 sm:gap-3">
-        {/* Mic toggle */}
-        <button
-          onClick={onToggleMute}
-          className={`btn btn-icon ${
-            isMuted ? "bg-red-500 hover:bg-red-600" : "btn-secondary"
-          }`}
-          title={isMuted ? "Unmute (M)" : "Mute (M)"}
-        >
-          {isMuted ? (
-            <MicOff className="w-5 h-5" />
-          ) : (
-            <Mic className="w-5 h-5" />
-          )}
-        </button>
+        <div className="flex justify-center xl:justify-self-center">
+          <div className="inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(23,32,51,0.12)] bg-white/82 px-2 py-2 shadow-[0_18px_40px_rgba(23,32,51,0.08)] backdrop-blur">
+            <ControlButton
+              onClick={onToggleMute}
+              active={!isMuted}
+              alert={isMuted}
+              title={isMuted ? "Unmute (M)" : "Mute (M)"}
+              label="Mic"
+              icon={isMuted ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+            />
+            <ControlButton
+              onClick={onToggleVideo}
+              active={!isVideoOff}
+              alert={isVideoOff}
+              title={isVideoOff ? "Turn on camera (V)" : "Turn off camera (V)"}
+              label="Camera"
+              icon={isVideoOff ? <VideoOff className="h-5 w-5" /> : <Video className="h-5 w-5" />}
+            />
+            <div className="hidden h-8 w-px bg-white/10 sm:block" />
+            <ControlButton
+              onClick={handleScreenShare}
+              active={isScreenSharing}
+              title={isScreenSharing ? "Stop presenting" : "Present screen"}
+              label="Present"
+              icon={isScreenSharing ? <MonitorOff className="h-5 w-5" /> : <Monitor className="h-5 w-5" />}
+            />
+          </div>
+        </div>
 
-        {/* Camera toggle */}
-        <button
-          onClick={onToggleVideo}
-          className={`btn btn-icon ${
-            isVideoOff ? "bg-red-500 hover:bg-red-600" : "btn-secondary"
-          }`}
-          title={isVideoOff ? "Turn on camera (V)" : "Turn off camera (V)"}
-        >
-          {isVideoOff ? (
-            <VideoOff className="w-5 h-5" />
-          ) : (
-            <Video className="w-5 h-5" />
-          )}
-        </button>
-
-        {/* Screen share - hidden on mobile */}
-        <button
-          onClick={handleScreenShare}
-          className={`btn btn-icon hidden sm:flex ${
-            isScreenSharing
-              ? "bg-primary-600 hover:bg-primary-700"
-              : "btn-secondary"
-          }`}
-          title={isScreenSharing ? "Stop presenting (S)" : "Present (S)"}
-        >
-          {isScreenSharing ? (
-            <MonitorOff className="w-5 h-5" />
-          ) : (
-            <Monitor className="w-5 h-5" />
-          )}
-        </button>
-
-        {/* Hand raise - hidden on small mobile */}
-        <button
-          onClick={onToggleHandRaise}
-          className={`btn btn-icon hidden xs:flex ${
-            isHandRaised
-              ? "bg-yellow-500 hover:bg-yellow-600 animate-hand-pulse"
-              : "btn-secondary"
-          }`}
-          title={isHandRaised ? "Lower hand (H)" : "Raise hand (H)"}
-        >
-          <Hand className="w-5 h-5" />
-        </button>
-
-        {/* Divider on mobile */}
-        <div className="w-px h-6 bg-dark-600 sm:hidden" />
-
-        {/* Chat - shown inline on mobile */}
-        <button
-          onClick={toggleChat}
-          className={`btn btn-icon relative sm:hidden ${
-            isChatOpen ? "bg-primary-600" : "btn-secondary"
-          }`}
-          title="Chat (C)"
-        >
-          <MessageSquare className="w-5 h-5" />
-          {unreadMessageCount > 0 && !isChatOpen && (
-            <span className="absolute -top-1 -right-1 min-w-[1rem] h-4 bg-red-500 rounded-full text-xs flex items-center justify-center px-1">
-              {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
-            </span>
-          )}
-        </button>
-
-        {/* Participants - shown inline on mobile */}
-        <button
-          onClick={toggleParticipants}
-          className={`btn btn-icon relative sm:hidden ${
-            isParticipantsOpen ? "bg-primary-600" : "btn-secondary"
-          }`}
-          title="Participants (P)"
-        >
-          <Users className="w-5 h-5" />
-          <span className="absolute -top-1 -right-1 min-w-[1rem] h-4 bg-dark-600 rounded-full text-xs flex items-center justify-center px-1">
-            {participantCount}
-          </span>
-        </button>
-
-        {/* Leave button */}
-        <button
-          onClick={onLeave}
-          className="btn btn-icon bg-red-600 hover:bg-red-700"
-          title="Leave meeting"
-        >
-          <PhoneOff className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* Right side - panels */}
-      <div className="hidden sm:flex items-center gap-2">
-        {/* Chat */}
-        <button
-          onClick={toggleChat}
-          className={`btn btn-icon relative ${
-            isChatOpen ? "bg-primary-600" : "btn-secondary"
-          }`}
-          title="Chat (C)"
-        >
-          <MessageSquare className="w-5 h-5" />
-          {unreadMessageCount > 0 && !isChatOpen && (
-            <span className="absolute -top-1 -right-1 min-w-[1rem] h-4 bg-red-500 rounded-full text-xs flex items-center justify-center px-1">
-              {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
-            </span>
-          )}
-        </button>
-
-        {/* Participants */}
-        <button
-          onClick={toggleParticipants}
-          className={`btn btn-icon relative ${
-            isParticipantsOpen ? "bg-primary-600" : "btn-secondary"
-          }`}
-          title="Participants (P)"
-        >
-          <Users className="w-5 h-5" />
-          <span className="absolute -top-1 -right-1 min-w-[1rem] h-4 bg-dark-600 rounded-full text-xs flex items-center justify-center px-1">
-            {participantCount}
-          </span>
-        </button>
+        <div className="flex items-center justify-end gap-2 overflow-x-auto pb-1 xl:justify-self-end xl:pb-0">
+          <ControlButton
+            onClick={onToggleHandRaise}
+            active={isHandRaised}
+            title={isHandRaised ? "Lower hand (H)" : "Raise hand (H)"}
+            label="Hand"
+            icon={<Hand className="h-5 w-5" />}
+            compact
+          />
+          <ControlButton
+            onClick={toggleChat}
+            active={isChatOpen}
+            title="Chat (C)"
+            label="Chat"
+            icon={<MessageSquare className="h-5 w-5" />}
+            compact
+            badge={
+              unreadMessageCount > 0 && !isChatOpen ? (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] text-white">
+                  {unreadMessageCount > 99 ? "99+" : unreadMessageCount}
+                </span>
+              ) : undefined
+            }
+          />
+          <ControlButton
+            onClick={toggleParticipants}
+            active={isParticipantsOpen}
+            title="Participants (P)"
+            label="People"
+            icon={<Users className="h-5 w-5" />}
+            compact
+            badge={
+              <span className="absolute -right-1 -top-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-dark-600 px-1 text-[10px] text-white">
+                {participantCount}
+              </span>
+            }
+          />
+          <ControlButton
+            onClick={handleLeaveClick}
+            alert
+            title={confirmLeave ? "Click again to leave" : "Leave meeting"}
+            label={confirmLeave ? "Confirm leave" : "Leave"}
+            icon={<PhoneOff className="h-5 w-5" />}
+          />
+        </div>
       </div>
     </div>
   );

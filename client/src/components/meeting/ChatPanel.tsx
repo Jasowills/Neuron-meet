@@ -58,26 +58,29 @@ export default function ChatPanel({
   const typingUsersList = Array.from(typingUsers.values());
 
   return (
-    <div className="flex flex-col h-full bg-dark-800">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-dark-700">
-        <h3 className="text-white font-semibold">In-call messages</h3>
-        <button
-          onClick={toggleChat}
-          className="btn btn-ghost btn-icon"
-          title="Close chat"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <div className="flex h-full flex-col bg-transparent">
+      <div className="border-b border-[rgba(23,32,51,0.08)] p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-dark-300">Conversation</p>
+            <h3 className="mt-1 text-lg font-semibold text-dark-900">Chat</h3>
+          </div>
+          <button
+            onClick={toggleChat}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[rgba(23,32,51,0.1)] bg-white/78 text-dark-700 transition hover:bg-white hover:text-dark-900"
+            title="Close chat"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
-          <div className="text-center text-dark-400 py-8">
-            <p className="text-sm">No messages yet</p>
-            <p className="text-xs mt-1">
-              Messages are only visible to people in the call
+          <div className="rounded-[10px] border border-[rgba(23,32,51,0.1)] bg-white/70 px-5 py-8 text-center text-dark-300">
+            <p className="text-sm font-medium text-dark-900">No chat yet</p>
+            <p className="mt-1 text-xs text-dark-400">
+              Messages stay inside this room
             </p>
           </div>
         ) : (
@@ -94,30 +97,29 @@ export default function ChatPanel({
 
       {/* Typing indicator */}
       {typingUsersList.length > 0 && (
-        <div className="px-4 py-2 text-dark-400 text-sm">
+        <div className="px-4 py-2 text-sm text-dark-300">
           {typingUsersList.length === 1
-            ? `${typingUsersList[0]} is typing...`
-            : `${typingUsersList.length} people are typing...`}
+            ? `${typingUsersList[0]} is typing`
+            : `${typingUsersList.length} people are typing`}
         </div>
       )}
 
-      {/* Input */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-dark-700">
+      <form onSubmit={handleSubmit} className="border-t border-[rgba(23,32,51,0.08)] p-4">
         <div className="flex gap-2">
           <input
             type="text"
             value={message}
             onChange={handleInputChange}
-            placeholder="Send a message..."
-            className="input flex-1"
+            placeholder="Write a message"
+            className="flex-1 rounded-[8px] border border-[rgba(23,32,51,0.12)] bg-white/84 px-4 py-3 text-[0.98rem] text-dark-900 outline-none transition placeholder:text-[#77839a] focus:border-[rgba(196,164,106,0.55)] focus:shadow-[0_0_0_4px_rgba(196,164,106,0.12)]"
           />
           <button
             type="submit"
             disabled={!message.trim()}
-            className="btn btn-primary btn-icon"
+            className="inline-flex h-[50px] w-[50px] items-center justify-center rounded-[8px] bg-[linear-gradient(135deg,var(--nm-brand)_0%,#3153bd_100%)] text-white shadow-[0_14px_24px_rgba(32,55,138,0.2)] transition hover:translate-y-[-1px] hover:shadow-[0_18px_28px_rgba(32,55,138,0.24)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
             title="Send message"
           >
-            <Send className="w-5 h-5" />
+            <Send className="h-4.5 w-4.5" />
           </button>
         </div>
       </form>
@@ -141,7 +143,7 @@ function MessageBubble({
 
   if (message.type === "SYSTEM") {
     return (
-      <div className="text-center text-dark-400 text-xs py-1">
+      <div className="py-1 text-center text-xs text-dark-300">
         {message.content}
       </div>
     );
@@ -150,16 +152,18 @@ function MessageBubble({
   return (
     <div className={`flex flex-col ${isOwn ? "items-end" : "items-start"}`}>
       <div className="flex items-center gap-2 mb-1">
-        <span className="text-dark-400 text-xs">
+        <span className="text-dark-300 text-xs uppercase tracking-[0.14em]">
           {isOwn ? "You" : message.senderName}
         </span>
-        <span className="text-dark-500 text-xs">
+        <span className="text-dark-400 text-xs">
           {formatTime(message.timestamp)}
         </span>
       </div>
       <div
-        className={`max-w-[80%] rounded-xl px-3 py-2 ${
-          isOwn ? "bg-primary-600 text-white" : "bg-dark-700 text-white"
+        className={`max-w-[80%] rounded-[10px] border px-3 py-2.5 ${
+          isOwn
+            ? "border-primary-500/40 bg-primary-600 text-white"
+            : "border-[rgba(23,32,51,0.1)] bg-white/72 text-dark-900"
         }`}
       >
         <p className="text-sm break-words">{message.content}</p>

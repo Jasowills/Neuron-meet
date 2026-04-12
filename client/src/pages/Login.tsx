@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Video, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, ShieldCheck, Sparkles } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
+import BrandLogo from '@/components/ui/BrandLogo';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -28,29 +29,55 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-dark-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link to="/" className="flex justify-center items-center gap-2 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center">
-            <Video className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-xl font-bold text-white">Neuron Meet</span>
-        </Link>
+    <div className="nm-page flex items-center py-6 sm:py-10">
+      <div className="nm-shell grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
+        <section className="nm-panel-dark px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+          <Link to="/" className="inline-flex">
+            <BrandLogo caption="Back to your rooms" tone="light" />
+          </Link>
 
-        <div className="card">
-          <h2 className="text-2xl font-bold text-white text-center mb-6">
-            Welcome back
-          </h2>
-
-          {error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
-              {error}
+          <div className="mt-10 max-w-xl">
+            <div className="nm-kicker bg-white/10 text-white border-white/10">
+              Quick sign in
             </div>
-          )}
+            <h1 className="mt-6 font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+              Get back into your next call.
+            </h1>
+            <p className="mt-5 max-w-lg text-base leading-7 text-[#d3d9e6] sm:text-lg">
+              Sign in to open rooms, invite people, and rejoin meetings you already have in motion.
+            </p>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="mt-10 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
+              <ShieldCheck className="h-5 w-5 text-[#c4a46a]" />
+              <h2 className="mt-4 text-base font-semibold text-white">Guest access that stays orderly</h2>
+              <p className="mt-2 text-sm leading-6 text-[#c8cfdd]">
+                Let outside guests join the room without turning the join flow into a mess.
+              </p>
+            </div>
+            <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
+              <Sparkles className="h-5 w-5 text-[#c4a46a]" />
+              <h2 className="mt-4 text-base font-semibold text-white">A room people can read quickly</h2>
+              <p className="mt-2 text-sm leading-6 text-[#c8cfdd]">
+                The layout keeps the next action obvious instead of hiding it behind generic chrome.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="nm-panel px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+          <p className="nm-label">Sign in</p>
+          <h2 className="nm-heading-lg text-[2.4rem]">Welcome back</h2>
+          <p className="nm-note mt-3 max-w-md">
+            Open your rooms, invite people, and move straight into the next session.
+          </p>
+
+          {error && <div className="nm-alert mt-6">{error}</div>}
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-dark-300 mb-1">
+              <label htmlFor="email" className="nm-label">
                 Email
               </label>
               <input
@@ -58,14 +85,14 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input"
+                className="nm-field"
                 placeholder="you@example.com"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-dark-300 mb-1">
+              <label htmlFor="password" className="nm-label">
                 Password
               </label>
               <input
@@ -73,8 +100,8 @@ export default function Login() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input"
-                placeholder="••••••••"
+                className="nm-field"
+                placeholder="Enter your password"
                 required
               />
             </div>
@@ -82,23 +109,26 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="btn btn-primary btn-md w-full"
+              className="nm-btn nm-btn-primary w-full"
             >
               {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                'Sign In'
+                <>
+                  Continue
+                  <ArrowRight className="h-4 w-4" />
+                </>
               )}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-dark-400">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-primary-500 hover:text-primary-400">
-              Sign up
+          <p className="mt-6 text-sm text-dark-500">
+            New to NeuronMeet?{' '}
+            <Link to="/register" className="nm-link">
+              Create an account
             </Link>
           </p>
-        </div>
+        </section>
       </div>
     </div>
   );
