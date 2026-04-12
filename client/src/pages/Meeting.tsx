@@ -134,7 +134,7 @@ export default function Meeting() {
         </div>
       )}
 
-      <div className="border-b border-[rgba(23,32,51,0.08)] bg-white/72 px-4 py-3 backdrop-blur-xl sm:px-5">
+      <div className="border-b border-[rgba(23,32,51,0.08)] bg-white/72 px-3 py-2.5 backdrop-blur-xl sm:px-4 sm:py-3 lg:px-5">
         <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex min-w-0 items-center gap-4">
             <div>
@@ -167,7 +167,7 @@ export default function Meeting() {
       {/* Main content area */}
       <div className="relative mx-auto flex w-full max-w-[1500px] min-h-0 flex-1 overflow-hidden">
         {/* Video area */}
-        <div className="flex-1 overflow-hidden p-3 sm:p-4 lg:p-5">
+        <div className="flex-1 overflow-hidden p-2 sm:p-3 lg:p-4 xl:p-5">
           <VideoGrid />
         </div>
 
@@ -183,7 +183,7 @@ export default function Meeting() {
                   useMeetingStore.getState().toggleParticipants();
               }}
             />
-            <div className="absolute inset-x-0 bottom-0 top-0 z-40 flex max-h-full w-full flex-col border-l border-[rgba(23,32,51,0.08)] bg-[rgba(255,255,255,0.82)] backdrop-blur-xl md:relative md:inset-auto md:w-96 md:rounded-l-[14px] md:border md:border-[rgba(23,32,51,0.08)] md:shadow-[0_18px_40px_rgba(23,32,51,0.08)]">
+            <div className="absolute inset-x-0 bottom-0 top-0 z-40 flex max-h-full w-full flex-col border-l border-[rgba(23,32,51,0.08)] bg-[rgba(255,255,255,0.82)] backdrop-blur-xl md:relative md:inset-auto md:w-[22rem] md:rounded-l-[14px] md:border md:border-[rgba(23,32,51,0.08)] md:shadow-[0_18px_40px_rgba(23,32,51,0.08)] lg:w-96">
               {isChatOpen && (
                 <ChatPanel
                   onSendMessage={sendMessage}

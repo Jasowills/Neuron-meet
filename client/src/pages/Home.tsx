@@ -26,9 +26,9 @@ export default function Home() {
   return (
     <div className="nm-page pb-12">
       <header className="pt-5 sm:pt-7">
-        <div className="nm-shell flex items-center justify-between rounded-[32px] border border-white/60 bg-white/65 px-4 py-4 shadow-[0_20px_50px_rgba(23,32,51,0.06)] backdrop-blur md:px-6">
+        <div className="nm-shell flex flex-col items-start gap-4 rounded-[26px] border border-white/60 bg-white/65 px-4 py-4 shadow-[0_20px_50px_rgba(23,32,51,0.06)] backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:rounded-[32px] md:px-6">
           <BrandLogo />
-          <nav className="flex items-center gap-2 sm:gap-3">
+          <nav className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:justify-start sm:gap-3">
             {user ? (
               <Link to="/dashboard" className="nm-btn nm-btn-primary">
                 Dashboard
@@ -54,8 +54,8 @@ export default function Home() {
       </header>
 
       <main className="nm-shell pt-8 sm:pt-10">
-        <section className="grid gap-6 lg:grid-cols-[1.25fr_0.9fr] lg:items-stretch">
-          <div className="nm-mesh nm-panel px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+        <section className="grid gap-5 md:gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(19rem,0.85fr)] lg:items-stretch xl:grid-cols-[1.25fr_0.9fr]">
+          <div className="nm-mesh nm-panel px-5 py-6 sm:px-7 sm:py-8 lg:px-9 lg:py-10 xl:px-10 xl:py-12">
             <div className="relative z-[1] max-w-3xl">
               <div className="nm-kicker mb-6">
                 <Briefcase className="h-4 w-4" />
@@ -70,7 +70,7 @@ export default function Home() {
                 interface to other people.
               </p>
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <div className="nm-stat">
                   <strong>&lt;10 sec</strong>
                   <span>Typical path from code entry to device check</span>
@@ -91,7 +91,7 @@ export default function Home() {
 
               <div className="nm-divider my-8" />
 
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 <div className="nm-chip">
                   <ShieldCheck className="h-4 w-4 text-primary-700" />
                   Waiting room support
@@ -108,7 +108,7 @@ export default function Home() {
             </div>
           </div>
 
-          <aside className="nm-panel px-6 py-6 sm:px-7 sm:py-7 lg:px-8 lg:py-8">
+          <aside className="nm-panel px-5 py-6 sm:px-6 sm:py-7 lg:px-7 lg:py-8 xl:px-8">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="nm-label">Primary action</p>
@@ -180,8 +180,8 @@ export default function Home() {
           </aside>
         </section>
 
-        <section className="mt-8 grid gap-4 lg:grid-cols-[1.2fr_0.8fr_0.8fr]">
-          <div className="nm-panel px-6 py-6 sm:px-7 sm:py-7">
+        <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-[1.2fr_0.8fr_0.8fr]">
+          <div className="nm-panel px-5 py-5 sm:px-6 sm:py-6 md:col-span-2 xl:col-span-1 xl:px-7 xl:py-7">
             <p className="nm-label">Operational reliability</p>
             <h3 className="text-2xl font-bold tracking-tight text-dark-900">
               Clear meeting flow, not extra ceremony.
@@ -191,7 +191,7 @@ export default function Home() {
               setup, and stay in control once the call starts.
             </p>
           </div>
-          <div className="nm-panel px-6 py-6">
+          <div className="nm-panel px-5 py-5 sm:px-6 sm:py-6">
             <ShieldCheck className="h-6 w-6 text-primary-700" />
             <h3 className="mt-5 text-lg font-bold text-dark-900">
               Room controls
@@ -201,7 +201,7 @@ export default function Home() {
               with people outside your team.
             </p>
           </div>
-          <div className="nm-panel px-6 py-6">
+          <div className="nm-panel px-5 py-5 sm:px-6 sm:py-6">
             <Waypoints className="h-6 w-6 text-primary-700" />
             <h3 className="mt-5 text-lg font-bold text-dark-900">
               In-call tools

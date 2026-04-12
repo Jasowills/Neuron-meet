@@ -59,7 +59,7 @@ export default function ChatPanel({
 
   return (
     <div className="flex h-full flex-col bg-transparent">
-      <div className="border-b border-[rgba(23,32,51,0.08)] p-4">
+      <div className="border-b border-[rgba(23,32,51,0.08)] p-3 sm:p-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-dark-300">
@@ -77,7 +77,7 @@ export default function ChatPanel({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-3 space-y-3 sm:p-4 sm:space-y-4">
         {messages.length === 0 ? (
           <div className="rounded-[10px] border border-[rgba(23,32,51,0.1)] bg-white/70 px-5 py-8 text-center text-dark-300">
             <p className="text-sm font-medium text-dark-900">No chat yet</p>
@@ -99,7 +99,7 @@ export default function ChatPanel({
 
       {/* Typing indicator */}
       {typingUsersList.length > 0 && (
-        <div className="px-4 py-2 text-sm text-dark-300">
+        <div className="px-3 py-2 text-sm text-dark-300 sm:px-4">
           {typingUsersList.length === 1
             ? `${typingUsersList[0]} is typing`
             : `${typingUsersList.length} people are typing`}
@@ -108,7 +108,7 @@ export default function ChatPanel({
 
       <form
         onSubmit={handleSubmit}
-        className="border-t border-[rgba(23,32,51,0.08)] p-4"
+        className="border-t border-[rgba(23,32,51,0.08)] p-3 sm:p-4"
       >
         <div className="flex gap-2">
           <input
@@ -165,7 +165,7 @@ function MessageBubble({
         </span>
       </div>
       <div
-        className={`max-w-[80%] rounded-[10px] border px-3 py-2.5 ${
+        className={`max-w-[88%] rounded-[10px] border px-3 py-2.5 sm:max-w-[80%] ${
           isOwn
             ? "border-primary-500/40 bg-primary-600 text-white"
             : "border-[rgba(23,32,51,0.1)] bg-white/72 text-dark-900"

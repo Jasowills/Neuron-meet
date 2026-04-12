@@ -29,9 +29,9 @@ export default function Login() {
   };
 
   return (
-    <div className="nm-page flex items-center py-6 sm:py-10">
-      <div className="nm-shell grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
-        <section className="nm-panel-dark px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+    <div className="nm-page flex items-start py-4 sm:py-8 lg:items-center lg:py-10">
+      <div className="nm-shell grid gap-5 md:gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
+        <section className="nm-panel-dark px-5 py-6 sm:px-7 sm:py-8 lg:px-9 lg:py-10 xl:px-10 xl:py-12">
           <Link to="/" className="inline-flex">
             <BrandLogo caption="Back to your rooms" tone="light" />
           </Link>
@@ -49,7 +49,7 @@ export default function Login() {
             </p>
           </div>
 
-          <div className="mt-10 grid gap-3 sm:grid-cols-2">
+          <div className="mt-8 grid gap-3 sm:grid-cols-2">
             <div className="rounded-[24px] border border-white/10 bg-white/5 p-4">
               <ShieldCheck className="h-5 w-5 text-[#c4a46a]" />
               <h2 className="mt-4 text-base font-semibold text-white">
@@ -73,7 +73,7 @@ export default function Login() {
           </div>
         </section>
 
-        <section className="nm-panel px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+        <section className="nm-panel px-5 py-6 sm:px-7 sm:py-8 lg:px-9 lg:py-10 xl:px-10 xl:py-12">
           <p className="nm-label">Sign in</p>
           <h2 className="nm-heading-lg text-[2.4rem]">Welcome back</h2>
           <p className="nm-note mt-3 max-w-md">

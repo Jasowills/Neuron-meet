@@ -159,7 +159,7 @@ export default function VideoGrid() {
             {allParticipants.map((participant) => (
               <div
                 key={participant.socketId}
-                className="w-[156px] shrink-0 sm:w-[188px]"
+                className="w-[132px] shrink-0 sm:w-[156px] lg:w-[188px]"
               >
                 <div className="aspect-video">
                   <VideoTile
@@ -193,7 +193,7 @@ export default function VideoGrid() {
       <div className="flex-1 flex flex-col min-h-0">
         {/* Grid container */}
         <div
-          className={`flex-1 grid ${gridLayout.className} content-center items-center gap-3 p-2 sm:gap-4 sm:p-4`}
+          className={`flex-1 grid ${gridLayout.className} content-center items-center gap-2 p-1.5 sm:gap-3 sm:p-3 lg:gap-4 lg:p-4`}
         >
           {visibleParticipants.map((participant) => (
             <div

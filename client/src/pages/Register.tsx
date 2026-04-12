@@ -30,9 +30,9 @@ export default function Register() {
   };
 
   return (
-    <div className="nm-page flex items-center py-6 sm:py-10">
-      <div className="nm-shell grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-stretch">
-        <section className="nm-panel px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+    <div className="nm-page flex items-start py-4 sm:py-8 lg:items-center lg:py-10">
+      <div className="nm-shell grid gap-5 md:gap-6 lg:grid-cols-[1fr_1fr] lg:items-stretch">
+        <section className="nm-panel px-5 py-6 sm:px-7 sm:py-8 lg:px-9 lg:py-10 xl:px-10 xl:py-12">
           <Link to="/" className="inline-flex">
             <BrandLogo />
           </Link>
@@ -51,7 +51,7 @@ export default function Register() {
             </p>
           </div>
 
-          <div className="mt-10 rounded-[28px] border border-[#d7ddec] bg-white/80 p-5 shadow-[0_18px_40px_rgba(23,32,51,0.06)]">
+          <div className="mt-8 rounded-[24px] border border-[#d7ddec] bg-white/80 p-4 shadow-[0_18px_40px_rgba(23,32,51,0.06)] sm:p-5">
             <div className="flex items-start gap-3">
               <ShieldCheck className="mt-1 h-5 w-5 text-primary-700" />
               <div>
@@ -67,7 +67,7 @@ export default function Register() {
           </div>
         </section>
 
-        <section className="nm-panel-dark px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+        <section className="nm-panel-dark px-5 py-6 sm:px-7 sm:py-8 lg:px-9 lg:py-10 xl:px-10 xl:py-12">
           <p className="nm-label text-[#d4dae7]">Create account</p>
           <h2 className="font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl">
             Start with a room that makes sense.

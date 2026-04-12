@@ -215,7 +215,7 @@ export default function PreJoin() {
   return (
     <div className="nm-page pb-10 pt-5 sm:pt-7">
       <div className="nm-shell">
-        <header className="mb-6 flex flex-col gap-4 rounded-[32px] border border-white/60 bg-white/70 px-4 py-4 shadow-[0_20px_50px_rgba(23,32,51,0.06)] backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <header className="mb-5 flex flex-col gap-4 rounded-[26px] border border-white/60 bg-white/70 px-4 py-4 shadow-[0_20px_50px_rgba(23,32,51,0.06)] backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:rounded-[32px] sm:px-6">
           <BrandLogo caption="Pre-join check" />
           <div className="flex flex-wrap items-center gap-3 text-sm text-dark-600">
             <span className="nm-chip">
@@ -230,8 +230,8 @@ export default function PreJoin() {
           </div>
         </header>
 
-        <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-          <section className="nm-panel-dark px-5 py-5 sm:px-6 sm:py-6">
+        <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] md:items-start xl:grid-cols-[1.1fr_0.9fr]">
+          <section className="nm-panel-dark px-4 py-4 sm:px-5 sm:py-5 lg:px-6 lg:py-6">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#bfc9da]">
@@ -244,7 +244,7 @@ export default function PreJoin() {
                   Check how you look and sound before you enter the room.
                 </p>
               </div>
-              <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-[#dce2ed]">
+              <div className="flex w-full items-center justify-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-[#dce2ed] sm:w-auto">
                 {isVideoOn ? "Camera ready" : "Camera off"} ·{" "}
                 {isAudioOn ? "Mic live" : "Mic muted"}
               </div>
@@ -269,10 +269,10 @@ export default function PreJoin() {
               )}
             </div>
 
-            <div className="mt-5 flex flex-wrap justify-center gap-3">
+            <div className="mt-5 flex flex-wrap justify-stretch gap-3 sm:justify-center">
               <button
                 onClick={toggleAudio}
-                className={`nm-btn ${
+                className={`nm-btn flex-1 sm:flex-none ${
                   isAudioOn ? "nm-btn-tertiary" : "bg-red-600 text-white"
                 }`}
                 title={isAudioOn ? "Mute" : "Unmute"}
@@ -286,7 +286,7 @@ export default function PreJoin() {
               </button>
               <button
                 onClick={toggleVideo}
-                className={`nm-btn ${
+                className={`nm-btn flex-1 sm:flex-none ${
                   isVideoOn ? "nm-btn-tertiary" : "bg-red-600 text-white"
                 }`}
                 title={isVideoOn ? "Turn off camera" : "Turn on camera"}
@@ -300,7 +300,7 @@ export default function PreJoin() {
               </button>
               <button
                 onClick={() => setShowSettings(!showSettings)}
-                className="nm-btn nm-btn-tertiary"
+                className="nm-btn nm-btn-tertiary w-full sm:w-auto"
                 title="Settings"
               >
                 <Settings className="w-5 h-5" />
@@ -309,7 +309,7 @@ export default function PreJoin() {
             </div>
           </section>
 
-          <section className="nm-panel flex flex-col px-6 py-6 sm:px-7 sm:py-7">
+          <section className="nm-panel flex flex-col px-5 py-5 sm:px-6 sm:py-6 lg:px-7 lg:py-7">
             <div>
               <p className="nm-label">Join details</p>
               <h2 className="nm-heading-lg text-[2.2rem]">
@@ -443,7 +443,7 @@ export default function PreJoin() {
 
             {error && <div className="nm-alert mt-5">{error}</div>}
 
-            <div className="mt-auto pt-6 space-y-3">
+            <div className="mt-8 space-y-3 md:mt-auto md:pt-6">
               <button
                 onClick={handleJoin}
                 disabled={!user && !guestName.trim()}

@@ -43,8 +43,8 @@ function ControlButton({
       : "border-[rgba(23,32,51,0.12)] bg-white/82 text-dark-800 hover:bg-white";
 
   const sizeClass = compact
-    ? "min-w-[3rem] px-3 py-2.5"
-    : "min-w-[5.25rem] px-3.5 py-3";
+    ? "min-w-[2.75rem] px-2.5 py-2.5 sm:min-w-[3rem] sm:px-3"
+    : "min-w-[3.25rem] px-3 py-2.5 sm:min-w-[4.5rem] sm:px-3.5 sm:py-3";
 
   return (
     <button
@@ -53,7 +53,7 @@ function ControlButton({
       title={title}
     >
       {icon}
-      <span className={compact ? "hidden lg:inline" : "hidden sm:inline"}>
+      <span className={compact ? "hidden xl:inline" : "hidden md:inline"}>
         {label}
       </span>
       {badge}
@@ -203,12 +203,12 @@ export default function ControlBar({
   const participantCount = participants.size + 1;
 
   return (
-    <div className="border-t border-[rgba(23,32,51,0.08)] bg-white/70 px-3 py-3 backdrop-blur-xl sm:px-4">
-      <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-3 xl:grid xl:grid-cols-[auto_auto_auto] xl:items-center xl:justify-between xl:gap-4">
+    <div className="border-t border-[rgba(23,32,51,0.08)] bg-white/70 px-2 py-2.5 backdrop-blur-xl sm:px-3 sm:py-3 md:px-4">
+      <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-2.5 xl:grid xl:grid-cols-[auto_auto_auto] xl:items-center xl:justify-between xl:gap-4">
         <div className="flex items-center justify-between gap-3 xl:justify-start">
           <button
             onClick={handleCopyLink}
-            className="inline-flex items-center gap-2 rounded-md border border-[rgba(23,32,51,0.12)] bg-white/84 px-3.5 py-2.5 text-sm text-dark-700 transition hover:bg-white hover:text-dark-900"
+            className="inline-flex w-full items-center justify-between gap-2 rounded-md border border-[rgba(23,32,51,0.12)] bg-white/84 px-3 py-2.5 text-sm text-dark-700 transition hover:bg-white hover:text-dark-900 sm:w-auto sm:justify-start sm:px-3.5"
             disabled={!roomCode}
           >
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-dark-300">
@@ -226,7 +226,7 @@ export default function ControlBar({
         </div>
 
         <div className="flex justify-center xl:justify-self-center">
-          <div className="inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(23,32,51,0.12)] bg-white/82 px-2 py-2 shadow-[0_18px_40px_rgba(23,32,51,0.08)] backdrop-blur">
+          <div className="inline-flex w-full flex-wrap items-center justify-center gap-2 rounded-xl border border-[rgba(23,32,51,0.12)] bg-white/82 px-2 py-2 shadow-[0_18px_40px_rgba(23,32,51,0.08)] backdrop-blur sm:w-auto sm:flex-nowrap">
             <ControlButton
               onClick={onToggleMute}
               active={!isMuted}
@@ -272,7 +272,7 @@ export default function ControlBar({
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 overflow-x-auto pb-1 xl:justify-self-end xl:pb-0">
+        <div className="flex flex-wrap items-center justify-end gap-2 xl:justify-self-end">
           <ControlButton
             onClick={onToggleHandRaise}
             active={isHandRaised}

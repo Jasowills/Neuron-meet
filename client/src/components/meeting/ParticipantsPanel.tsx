@@ -23,7 +23,7 @@ export default function ParticipantsPanel() {
 
   return (
     <div className="flex h-full flex-col bg-transparent">
-      <div className="border-b border-[rgba(23,32,51,0.08)] p-4">
+      <div className="border-b border-[rgba(23,32,51,0.08)] p-3 sm:p-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-dark-300">
@@ -43,7 +43,7 @@ export default function ParticipantsPanel() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-2">
+      <div className="flex-1 overflow-y-auto p-3 space-y-2 sm:p-4">
         {localParticipant && (
           <ParticipantItem
             participant={{
@@ -113,7 +113,7 @@ function ParticipantItem({
   };
 
   return (
-    <div className="group relative flex items-center gap-3 rounded-[12px] border border-[rgba(23,32,51,0.1)] bg-white/70 p-3 transition hover:bg-white/86">
+    <div className="group relative flex items-center gap-3 rounded-[12px] border border-[rgba(23,32,51,0.1)] bg-white/70 p-2.5 transition hover:bg-white/86 sm:p-3">
       <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md bg-primary-600 text-sm font-semibold text-white">
         {getInitials(participant.displayName)}
       </div>

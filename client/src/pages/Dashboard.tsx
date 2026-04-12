@@ -53,7 +53,7 @@ export default function Dashboard() {
       <header className="pt-5 sm:pt-7">
         <div className="nm-shell flex flex-col gap-4 rounded-[32px] border border-white/60 bg-white/70 px-4 py-4 shadow-[0_20px_50px_rgba(23,32,51,0.06)] backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <BrandLogo caption="Rooms, codes, and upcoming calls" />
-          <div className="flex items-center gap-3 self-start sm:self-auto">
+          <div className="flex w-full flex-wrap items-center gap-3 self-start sm:w-auto sm:flex-nowrap sm:self-auto">
             <div className="rounded-full border border-dark-200 bg-white px-4 py-2 text-sm text-dark-700 shadow-sm">
               <p className="font-semibold text-dark-900">{user?.displayName}</p>
               <p className="text-xs text-dark-500">{user?.email}</p>
@@ -71,8 +71,8 @@ export default function Dashboard() {
       </header>
 
       <main className="nm-shell pt-8 sm:pt-10">
-        <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-          <div className="nm-panel px-6 py-8 sm:px-8 sm:py-9">
+        <section className="grid gap-5 md:gap-6 lg:grid-cols-[minmax(0,1.12fr)_minmax(19rem,0.88fr)] xl:grid-cols-[1.15fr_0.85fr]">
+          <div className="nm-panel px-5 py-6 sm:px-7 sm:py-8 lg:px-8 lg:py-9">
             <p className="nm-label">Operations</p>
             <h1 className="nm-heading-lg text-[2.7rem]">
               Start a room or join one.
@@ -82,10 +82,10 @@ export default function Dashboard() {
               already running. Both paths stay visible on the same screen.
             </p>
 
-            <div className="mt-8 grid gap-4 lg:grid-cols-2">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
               <form
                 onSubmit={handleCreateMeeting}
-                className="rounded-[28px] border border-[#d7ddec] bg-white/78 p-5 shadow-[0_18px_40px_rgba(23,32,51,0.05)]"
+                className="rounded-[24px] border border-[#d7ddec] bg-white/78 p-4 shadow-[0_18px_40px_rgba(23,32,51,0.05)] sm:p-5"
               >
                 <div className="flex items-center gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary-50 text-primary-700">
@@ -131,7 +131,7 @@ export default function Dashboard() {
                 </button>
               </form>
 
-              <div className="rounded-[28px] border border-[#d7ddec] bg-white/78 p-5 shadow-[0_18px_40px_rgba(23,32,51,0.05)]">
+              <div className="rounded-[24px] border border-[#d7ddec] bg-white/78 p-4 shadow-[0_18px_40px_rgba(23,32,51,0.05)] sm:p-5">
                 <div className="flex items-center gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary-50 text-primary-700">
                     <UsersRound className="h-5 w-5" />
@@ -172,7 +172,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <aside className="nm-panel-dark px-6 py-8 sm:px-8 sm:py-9">
+          <aside className="nm-panel-dark px-5 py-6 sm:px-7 sm:py-8 lg:px-8 lg:py-9">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#c4cfdf]">
               Quick setup
             </p>
