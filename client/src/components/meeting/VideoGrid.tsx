@@ -24,7 +24,8 @@ export default function VideoGrid() {
   }, [participants]);
 
   const isPresentationMode =
-    isScreenSharing || participantList.some((participant) => participant.isScreenSharing);
+    isScreenSharing ||
+    participantList.some((participant) => participant.isScreenSharing);
 
   // All participants including local user
   const allParticipants = useMemo(() => {
@@ -50,7 +51,9 @@ export default function VideoGrid() {
       };
     }
 
-    const remotePresenter = participantList.find((participant) => participant.isScreenSharing);
+    const remotePresenter = participantList.find(
+      (participant) => participant.isScreenSharing,
+    );
 
     if (!remotePresenter) {
       return null;
@@ -130,7 +133,8 @@ export default function VideoGrid() {
                   autoPlay
                   playsInline
                   ref={(el) => {
-                    if (el && participant.stream) el.srcObject = participant.stream;
+                    if (el && participant.stream)
+                      el.srcObject = participant.stream;
                   }}
                   className="absolute inset-0 h-full w-full object-contain"
                 />
@@ -151,9 +155,7 @@ export default function VideoGrid() {
         </div>
 
         <div className="shrink-0 overflow-x-auto pb-1">
-          <div
-            className="mx-auto flex min-w-full max-w-[1320px] justify-start gap-3 rounded-[14px] border border-[rgba(23,32,51,0.12)] bg-[rgba(255,255,255,0.56)] px-3 py-3 shadow-[0_10px_26px_rgba(23,32,51,0.05)]"
-          >
+          <div className="mx-auto flex min-w-full max-w-[1320px] justify-start gap-3 rounded-[14px] border border-[rgba(23,32,51,0.12)] bg-[rgba(255,255,255,0.56)] px-3 py-3 shadow-[0_10px_26px_rgba(23,32,51,0.05)]">
             {allParticipants.map((participant) => (
               <div
                 key={participant.socketId}
@@ -164,9 +166,17 @@ export default function VideoGrid() {
                     participant={participant}
                     stream={participant.stream}
                     isLocal={participant.isLocal}
-                    isMuted={participant.isLocal ? isMuted : participant.isMuted}
-                    isVideoOff={participant.isLocal ? isVideoOff : participant.isVideoOff}
-                    isHandRaised={participant.isLocal ? isHandRaised : participant.isHandRaised}
+                    isMuted={
+                      participant.isLocal ? isMuted : participant.isMuted
+                    }
+                    isVideoOff={
+                      participant.isLocal ? isVideoOff : participant.isVideoOff
+                    }
+                    isHandRaised={
+                      participant.isLocal
+                        ? isHandRaised
+                        : participant.isHandRaised
+                    }
                   />
                 </div>
               </div>

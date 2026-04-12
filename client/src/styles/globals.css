@@ -25,7 +25,11 @@
   body {
     @apply antialiased;
     background:
-      radial-gradient(circle at top left, rgba(32, 55, 138, 0.12), transparent 30%),
+      radial-gradient(
+        circle at top left,
+        rgba(32, 55, 138, 0.12),
+        transparent 30%
+      ),
       linear-gradient(180deg, #fbfaf7 0%, #f3efe7 55%, #ece6da 100%);
     color: var(--nm-ink);
     font-family: "Manrope", system-ui, sans-serif;
@@ -110,7 +114,9 @@
   height: 3rem;
   border-radius: 1rem;
   background: linear-gradient(145deg, #20378a 0%, #2f53c5 55%, #8ea5f0 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 18px 30px rgba(32, 55, 138, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 18px 30px rgba(32, 55, 138, 0.22);
   overflow: hidden;
 }
 
@@ -213,7 +219,11 @@
 }
 
 .nm-panel-dark {
-  background: linear-gradient(180deg, rgba(13, 20, 34, 0.96) 0%, rgba(23, 32, 51, 0.96) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(13, 20, 34, 0.96) 0%,
+    rgba(23, 32, 51, 0.96) 100%
+  );
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 24px 60px rgba(8, 12, 20, 0.34);
   border-radius: 1.75rem;
@@ -234,7 +244,10 @@
   padding: 0.95rem 1rem;
   font-size: 0.98rem;
   outline: none;
-  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
 }
 
 .nm-field::placeholder {
@@ -284,7 +297,11 @@
   border-radius: 999px;
   padding: 0.9rem 1.35rem;
   font-weight: 700;
-  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease;
 }
 
 .nm-btn:hover {
@@ -338,7 +355,12 @@
 
 .nm-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(23, 32, 51, 0.12), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(23, 32, 51, 0.12),
+    transparent
+  );
 }
 
 .nm-note {
@@ -388,8 +410,16 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 20% 20%, rgba(196, 164, 106, 0.22), transparent 25%),
-    radial-gradient(circle at 80% 10%, rgba(63, 99, 216, 0.18), transparent 28%),
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(196, 164, 106, 0.22),
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 80% 10%,
+      rgba(63, 99, 216, 0.18),
+      transparent 28%
+    ),
     linear-gradient(180deg, rgba(255, 255, 255, 0.6), transparent 80%);
   pointer-events: none;
 }

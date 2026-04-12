@@ -53,7 +53,9 @@ function ControlButton({
       title={title}
     >
       {icon}
-      <span className={compact ? "hidden lg:inline" : "hidden sm:inline"}>{label}</span>
+      <span className={compact ? "hidden lg:inline" : "hidden sm:inline"}>
+        {label}
+      </span>
       {badge}
     </button>
   );
@@ -212,7 +214,9 @@ export default function ControlBar({
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-dark-300">
               Room
             </span>
-            <span className="font-mono text-dark-900">{roomCode || "Loading..."}</span>
+            <span className="font-mono text-dark-900">
+              {roomCode || "Loading..."}
+            </span>
             {copied ? (
               <Check className="h-4 w-4 text-green-500" />
             ) : (
@@ -229,7 +233,13 @@ export default function ControlBar({
               alert={isMuted}
               title={isMuted ? "Unmute (M)" : "Mute (M)"}
               label="Mic"
-              icon={isMuted ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+              icon={
+                isMuted ? (
+                  <MicOff className="h-5 w-5" />
+                ) : (
+                  <Mic className="h-5 w-5" />
+                )
+              }
             />
             <ControlButton
               onClick={onToggleVideo}
@@ -237,7 +247,13 @@ export default function ControlBar({
               alert={isVideoOff}
               title={isVideoOff ? "Turn on camera (V)" : "Turn off camera (V)"}
               label="Camera"
-              icon={isVideoOff ? <VideoOff className="h-5 w-5" /> : <Video className="h-5 w-5" />}
+              icon={
+                isVideoOff ? (
+                  <VideoOff className="h-5 w-5" />
+                ) : (
+                  <Video className="h-5 w-5" />
+                )
+              }
             />
             <div className="hidden h-8 w-px bg-white/10 sm:block" />
             <ControlButton
@@ -245,7 +261,13 @@ export default function ControlBar({
               active={isScreenSharing}
               title={isScreenSharing ? "Stop presenting" : "Present screen"}
               label="Present"
-              icon={isScreenSharing ? <MonitorOff className="h-5 w-5" /> : <Monitor className="h-5 w-5" />}
+              icon={
+                isScreenSharing ? (
+                  <MonitorOff className="h-5 w-5" />
+                ) : (
+                  <Monitor className="h-5 w-5" />
+                )
+              }
             />
           </div>
         </div>

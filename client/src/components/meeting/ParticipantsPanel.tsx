@@ -26,8 +26,12 @@ export default function ParticipantsPanel() {
       <div className="border-b border-[rgba(23,32,51,0.08)] p-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-dark-300">Participants</p>
-            <h3 className="mt-1 text-lg font-semibold text-dark-900">People in room ({totalCount})</h3>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-dark-300">
+              Participants
+            </p>
+            <h3 className="mt-1 text-lg font-semibold text-dark-900">
+              People in room ({totalCount})
+            </h3>
           </div>
           <button
             onClick={toggleParticipants}
@@ -125,7 +129,9 @@ function ParticipantItem({
           )}
         </div>
         {participant.isScreenSharing && (
-          <span className="inline-flex rounded-md border border-primary-400/25 bg-primary-500/12 px-2 py-0.5 text-[11px] font-medium text-primary-200">Presenting</span>
+          <span className="inline-flex rounded-md border border-primary-400/25 bg-primary-500/12 px-2 py-0.5 text-[11px] font-medium text-primary-200">
+            Presenting
+          </span>
         )}
       </div>
 

@@ -62,7 +62,9 @@ export default function ChatPanel({
       <div className="border-b border-[rgba(23,32,51,0.08)] p-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-dark-300">Conversation</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-dark-300">
+              Conversation
+            </p>
             <h3 className="mt-1 text-lg font-semibold text-dark-900">Chat</h3>
           </div>
           <button
@@ -104,7 +106,10 @@ export default function ChatPanel({
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="border-t border-[rgba(23,32,51,0.08)] p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="border-t border-[rgba(23,32,51,0.08)] p-4"
+      >
         <div className="flex gap-2">
           <input
             type="text"
